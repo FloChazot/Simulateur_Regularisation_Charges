@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Régularisation de Charges — BTS PI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1A3A6B;
+  --navy-dark: #0F2347;
+  --navy-light: #2A4F8F;
+  --orange: #F07800;
+  --orange-light: #FF9A30;
+  --white: #FFFFFF;
+  --grey-50: #F8F9FC;
+  --grey-100: #EEF1F7;
+  --grey-200: #D8DDED;
+  --grey-400: #8A96B0;
+  --grey-600: #4A5568;
+  --grey-800: #1E2740;
+  --green: #16A34A;
+  --green-light: #DCFCE7;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --orange-tip: #EA580C;
+  --orange-tip-light: #FFF7ED;
+  --radius: 10px;
+  --shadow: 0 2px 16px rgba(26,58,107,0.10);
+  --shadow-lg: 0 8px 40px rgba(26,58,107,0.16);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--grey-50);
+  color: var(--grey-800);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: #1a1a1a;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -40px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; right: 60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.025);
+  pointer-events: none;
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 22px 24px 18px;
+  position: relative;
+  z-index: 1;
+}
+.header-main { }
+.header-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(22px, 2.8vw, 32px);
+  font-weight: 400;
+  color: white;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+.header-byline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ── PROGRESS BAR ── */
+#progress-bar-container {
+  background: rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  z-index: 1;
+}
+.progress-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 7px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.progress-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.progress-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #F07800;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: #FF9A30;
+  white-space: nowrap;
+}
+.progress-bubbles {
+  display: flex;
+  gap: 4px;
+}
+.bubble {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-size: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.3s;
+}
+.bubble.done { background: #16A34A; border-color: #16A34A; color: white; }
+.bubble.aide { background: #F07800; border-color: #F07800; color: white; }
+
+/* ── TABS ── */
+.tabs-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--grey-200);
+  margin-bottom: 0;
+}
+.tab-btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+  border: none;
+  background: none;
+  color: var(--grey-400);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.tab-btn:hover { color: var(--navy); }
+.tab-btn.active {
+  color: var(--navy);
+  border-bottom-color: var(--orange);
+}
+
+/* ── PANELS ── */
+.panel { display: none; max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+.panel.active { display: block; }
+
+/* ── SIMULATEUR PANEL ── */
+.sim-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.sim-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.sim-card-header {
+  background: var(--navy);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sim-card-header h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: white;
+  letter-spacing: 0.3px;
+}
+.sim-card-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--orange);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.sim-card-body { padding: 20px; }
+
+.field-group { margin-bottom: 16px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey-400);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  display: block;
+}
+.field-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--grey-200);
+  border-radius: 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.92rem;
+  color: var(--navy);
+  background: var(--grey-50);
+  transition: border-color 0.2s;
+  appearance: none;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--navy-light);
+  background: white;
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.section-sep {
+  border: none;
+  border-top: 1px solid var(--grey-100);
+  margin: 16px 0;
+}
+
+.btn-calc {
+  width: 100%;
+  padding: 12px;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  letter-spacing: 0.3px;
+}
+.btn-calc:hover { background: var(--orange-light); }
+.btn-calc:active { transform: scale(0.98); }
+
+/* Results panel */
+.result-block {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-height: 420px;
+}
+.result-header {
+  background: var(--grey-800);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.result-header h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: white;
+}
+.result-body { padding: 20px; }
+.result-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  color: var(--grey-400);
+  gap: 12px;
+}
+.result-empty-icon { font-size: 3rem; opacity: 0.3; }
+.result-empty-text { font-size: 0.85rem; text-align: center; line-height: 1.6; }
+
+/* Result rows */
+.result-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--grey-400);
+  margin: 16px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--grey-100);
+}
+.result-section-title:first-child { margin-top: 0; }
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--grey-100);
+  font-size: 0.88rem;
+}
+.result-row:last-child { border-bottom: none; }
+.result-row-label { color: var(--grey-600); }
+.result-row-formula {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--grey-400);
+  margin-top: 2px;
+}
+.result-row-value {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.result-final {
+  margin-top: 16px;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.result-final.trop-percu {
+  background: var(--green-light);
+  border: 1.5px solid #86efac;
+}
+.result-final.moins-percu {
+  background: var(--red-light);
+  border: 1.5px solid #fca5a5;
+}
+.result-final.equilibre {
+  background: var(--grey-100);
+  border: 1.5px solid var(--grey-200);
+}
+.result-final-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.result-final.trop-percu .result-final-label { color: var(--green); }
+.result-final.moins-percu .result-final-label { color: var(--red); }
+.result-final-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+.result-final.trop-percu .result-final-amount { color: var(--green); }
+.result-final.moins-percu .result-final-amount { color: var(--red); }
+
+.result-provision {
+  margin-top: 12px;
+  background: var(--navy);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.result-provision-label {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.7);
+}
+.result-provision-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--orange-light);
+  font-weight: 500;
+}
+
+.info-box {
+  background: var(--orange-tip-light);
+  border-left: 3px solid var(--orange-tip);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--orange-tip);
+  line-height: 1.5;
+}
+
+/* ── EXERCICE PANEL ── */
+.exo-header-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.exo-select-wrap {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+}
+.exo-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--orange);
+  pointer-events: none;
+  font-size: 1rem;
+}
+.exo-select {
+  width: 100%;
+  padding: 11px 40px 11px 16px;
+  border: 2px solid var(--navy);
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--navy);
+  background: white;
+  appearance: none;
+  cursor: pointer;
+}
+.exo-select:focus { outline: none; border-color: var(--orange); }
+
+.btn-reset {
+  padding: 11px 20px;
+  border: 2px solid var(--grey-200);
+  border-radius: 8px;
+  background: white;
+  color: var(--grey-600);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-reset:hover { border-color: var(--navy); color: var(--navy); }
+
+/* Difficulty badge */
+.diff-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.diff-badge.facile { background: #DCFCE7; color: #15803D; }
+.diff-badge.moyen { background: #FEF9C3; color: #A16207; }
+.diff-badge.difficile { background: #FEE2E2; color: #B91C1C; }
+
+/* Cas card */
+.cas-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.cas-card-header {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cas-number {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: var(--orange-light);
+  letter-spacing: 1px;
+}
+.cas-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+  margin-top: 2px;
+}
+.cas-body { padding: 20px; }
+
+/* Contexte */
+.contexte-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ctx-item {
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.ctx-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--grey-400);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 3px;
+}
+.ctx-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+/* Questions */
+.question-block {
+  border: 1.5px solid var(--grey-200);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.question-block.state-done { border-color: #86efac; }
+.question-block.state-aide { border-color: var(--orange); }
+
+.question-header {
+  padding: 12px 16px;
+  background: var(--grey-50);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.q-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.question-block.state-done .q-num { background: var(--green); }
+.question-block.state-aide .q-num { background: var(--orange); }
+.q-text {
+  font-size: 0.88rem;
+  color: var(--grey-800);
+  font-weight: 500;
+  line-height: 1.4;
+  flex: 1;
+}
+.q-status-icon { font-size: 1rem; flex-shrink: 0; }
+
+.question-body { padding: 14px 16px; border-top: 1px solid var(--grey-100); }
+.question-body.hidden { display: none; }
+
+.answer-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.answer-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1.5px solid var(--grey-200);
+  border-radius: 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.92rem;
+  color: var(--navy);
+  transition: border-color 0.2s;
+}
+.answer-input:focus { outline: none; border-color: var(--navy); }
+.answer-input:disabled { background: var(--grey-100); cursor: not-allowed; }
+.answer-unit {
+  font-size: 0.85rem;
+  color: var(--grey-400);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-verifier {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 7px;
+  background: var(--navy);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-verifier:hover { background: var(--navy-light); }
+.btn-verifier:disabled { background: var(--grey-200); color: var(--grey-400); cursor: not-allowed; }
+
+.btn-aide {
+  padding: 8px 18px;
+  border: 2px solid var(--orange);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--orange);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-aide:hover { background: var(--orange); color: white; }
+
+.feedback-msg {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  margin-top: 8px;
+  display: none;
+}
+.feedback-msg.correct {
+  background: var(--green-light);
+  color: var(--green);
+  display: block;
+}
+.feedback-msg.wrong {
+  background: var(--red-light);
+  color: var(--red);
+  display: block;
+}
+
+.aide-box {
+  background: var(--orange-tip-light);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-top: 10px;
+  display: none;
+}
+.aide-box.open { display: block; }
+.aide-box-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--orange-tip);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.aide-box p {
+  font-size: 0.85rem;
+  color: var(--orange-tip);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+.aide-formula {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  background: rgba(240, 120, 0, 0.1);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-top: 6px;
+  color: var(--orange-tip);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .sim-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .tabs-container, .panel { padding-left: 12px; padding-right: 12px; }
+  .contexte-grid { grid-template-columns: 1fr 1fr; }
+  .header-inner { padding: 10px 12px; }
+  .progress-bubbles { display: none; }
+}
+/* ── MODE PRÉSENCE JOURS ── */
+.presence-tabs {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--grey-200);
+  border-radius: 7px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.presence-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: var(--grey-50);
+  color: var(--grey-400);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.presence-tab.active { background: var(--navy); color: white; }
+.presence-tab:not(:last-child) { border-right: 1.5px solid var(--grey-200); }
+
+.jours-detail {
+  background: var(--grey-50);
+  border: 1px solid var(--grey-100);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--grey-600);
+  line-height: 1.8;
+}
+.jours-coeff {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 0.88rem;
+}
+
+/* ── BADGE EXTREME ── */
+.diff-badge.extreme { background: #1E1B4B; color: #A5B4FC; }
+
+/* ── TABLEAUX CAS EXTRÊMES ── */
+.tableau-charges {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin: 16px 0;
+  overflow-x: auto;
+  display: block;
+}
+.tableau-charges th {
+  background: var(--navy);
+  color: white;
+  padding: 8px 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  border: 1px solid var(--navy-light);
+  text-align: center;
+}
+.tableau-charges th.th-poste { text-align: left; min-width: 160px; }
+.tableau-charges td {
+  padding: 7px 10px;
+  border: 1px solid var(--grey-200);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--grey-800);
+  text-align: right;
+  white-space: nowrap;
+}
+.tableau-charges td.td-poste {
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--navy);
+}
+.tableau-charges td.td-pct {
+  color: var(--grey-400);
+  font-size: 0.75rem;
+}
+.tableau-charges tr:nth-child(even) td { background: var(--grey-50); }
+.tableau-charges tr.tr-total td {
+  background: var(--navy);
+  color: white;
+  font-weight: 600;
+  border-color: var(--navy-light);
+}
+.tableau-charges tr.tr-subtotal td {
+  background: var(--grey-100);
+  font-weight: 600;
+  color: var(--navy);
+}
+.tableau-charges tr.tr-lot td {
+  background: #EFF6FF;
+  font-weight: 700;
+  color: var(--navy);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tableau-charges td.nr {
+  color: var(--red);
+  font-size: 0.72rem;
+}
+.tableau-charges td.rec {
+  color: var(--green);
+}
+
+.tableau-wrap {
+  overflow-x: auto;
+  margin: 12px 0;
+  border-radius: 8px;
+  border: 1px solid var(--grey-200);
+}
+
+.cas-note {
+  background: #EFF6FF;
+  border-left: 3px solid var(--navy-light);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+  color: var(--navy);
+  line-height: 1.6;
+}
+.cas-note strong { color: var(--navy-dark); }
+
+.locataire-card {
+  background: white;
+  border: 1.5px solid var(--grey-200);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.locataire-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--navy);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lot-badge {
+  background: var(--navy);
+  color: var(--orange-light);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+.locataire-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.loc-item { background: var(--grey-50); border-radius: 6px; padding: 7px 10px; }
+.loc-label { font-size: 0.68rem; font-weight: 600; color: var(--grey-400); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 2px; }
+.loc-value { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--navy); }
+
+.section-titre {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 10px 0 6px;
+  border-bottom: 2px solid var(--orange);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+</style></head><body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-main">
+      <div class="header-title">Simulateur Régularisation de Charges</div>
+      <div class="header-byline">by Florent Chazot</div>
+    </div>
+  </div>
+  <div id="progress-bar-container">
+    <div class="progress-inner">
+      <span class="progress-label">Progression</span>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+      <span id="prog-score" class="progress-score">0 / 0</span>
+      <div id="prog-bubbles" class="progress-bubbles"></div>
+    </div>
+  </div>
+</header>
+
+
+<!-- ═══════════════════ PANEL EXERCICE ═══════════════════ -->
+<div class="panel active" id="panel-exercice">
+  <div class="exo-header-bar">
+    <div class="exo-select-wrap">
+      <select class="exo-select" id="cas-select" onchange="loadCas()">
+        <option value="">— Choisir un cas pratique —</option>
+      </select>
+    </div>
+    <button class="btn-reset" onclick="resetCas()">↺ Réinitialiser</button>
+  </div>
+  <div id="cas-container">
+    <div style="text-align:center; padding: 60px 20px; color: var(--grey-400);">
+      <div style="font-size:3rem; margin-bottom:12px;">📂</div>
+      <div style="font-family:'Syne',sans-serif; font-size:1rem;">Sélectionnez un cas pratique pour commencer</div>
+    </div>
+  </div>
+</div>
+<script>
+const CAS = [
+  // ─── FACILES (1-3) ───────────────────────────────────────
+  {
+    id: 1, diff: 'facile',
+    titre: 'Régularisation annuelle simple',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois (année entière)' },
+      { label: 'Provision mensuelle', value: '50 €/mois' },
+      { label: 'Charges copro récupérables', value: '553,26 €' },
+      { label: 'TEOM', value: '83 €' },
+    ],
+    questions: [
+      {
+        q: 'Calculez le total des charges récupérables.',
+        reponse: 636.26, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Charges récupérables = copro récupérables + TEOM. Art. 23 loi 6 juillet 1989 — Décret 26 août 1987.', formule: '553,26 + 83 = 636,26 €' }
+      },
+      {
+        q: 'Calculez le total des provisions versées.',
+        reponse: 600, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions = provision mensuelle × mois de présence.', formule: '50 × 12 = 600 €' }
+      },
+      {
+        q: 'Régularisation. Positif = trop-perçu (bailleur rembourse). Négatif = moins-perçu (locataire compléte).',
+        reponse: 36.26, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Régularisation = Charges récupérables réelles − Provisions versées.', formule: '636,26 − 600 = +36,26 € (trop-perçu bailleur)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +1,5 %, arrondie à l\'€ supérieur).',
+        reponse: 54, tolerance: 0.5, unite: '€/mois',
+        aide: { texte: 'Nouvelle provision = charges réelles × (1 + inflation) / 12.', formule: '636,26 × 1,015 / 12 = 53,82 → 54 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 2, diff: 'facile',
+    titre: 'Sous-provision — moins-perçu bailleur',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '40 €/mois' },
+      { label: 'Charges copro récupérables', value: '612 €' },
+      { label: 'TEOM', value: '108 €' },
+    ],
+    questions: [
+      {
+        q: 'Calculez le total des charges récupérables.',
+        reponse: 720, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = copro récupérables + TEOM.', formule: '612 + 108 = 720 €' }
+      },
+      {
+        q: 'Régularisation (indiquer le signe).',
+        reponse: -240, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 40 × 12 = 480 €. Résultat négatif = moins-perçu → le LOCATAIRE doit régler le complément.', formule: '720 − 480 = −240 € (moins-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1, sans revalorisation.',
+        reponse: 60, tolerance: 0.5, unite: '€/mois',
+        aide: { texte: 'Sans inflation : nouvelle provision = charges réelles / 12.', formule: '720 / 12 = 60 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 3, diff: 'facile',
+    titre: 'Exercice DUNOD — Ex. 5 (copro en %)',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '60 €/mois' },
+      { label: 'Charges copro totales', value: '853,73 €' },
+      { label: '% récupérable (décret 26/08/1987)', value: '73,57 %' },
+      { label: 'Taxe foncière', value: '553 € dont TEOM 127 €' },
+    ],
+    questions: [
+      {
+        q: 'Calculez les charges locatives (copro récupérable + TEOM).',
+        reponse: 755.11, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Copro récupérable = 853,73 × 73,57 % = 628,11 €. Le syndic détermine le % en appliquant le décret du 26 août 1987.', formule: '853,73 × 73,57 % + 127 = 755,11 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 35.11, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 60 × 12 = 720 €.', formule: '755,11 − 720 = +35,11 € (trop-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +1,5 %, arrondi à l\'€ supérieur).',
+        reponse: 64, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: '755,11 × 1,015 / 12 = 63,87 → arrondi supérieur.', formule: '755,11 × 1,015 / 12 = 63,87 → 64 €/mois' }
+      }
+    ]
+  },
+
+  // ─── MOYENS (4-11) ───────────────────────────────────────
+  {
+    id: 4, diff: 'moyen',
+    titre: 'Exercice DUNOD — Ex. 6 (arrivée en cours d\'année)',
+    contexte: [
+      { label: 'Entrée dans les lieux', value: '1er février (11 mois de présence)' },
+      { label: 'Provision mensuelle', value: '110 €/mois' },
+      { label: 'Charges copro totales', value: '1 453,12 €' },
+      { label: 'dont récupérables', value: '1 213,75 €' },
+      { label: 'Taxe foncière', value: '752 € dont TEOM 195 €' },
+    ],
+    questions: [
+      {
+        q: 'Total annuel des charges récupérables (base 12 mois).',
+        reponse: 1408.75, tolerance: 0.6, unite: '€',
+        aide: { texte: 'On calcule d\'abord le total annuel, puis on proratise selon la présence du locataire.', formule: '1 213,75 + 195 = 1 408,75 €' }
+      },
+      {
+        q: 'Quote-part imputable au locataire (11 mois / 12).',
+        reponse: 1291.35, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Le locataire arrivé le 1er février n\'est redevable que de sa période de présence effective.', formule: '1 408,75 × 11/12 = 1 291,35 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 81.35, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 110 × 11 = 1 210 €.', formule: '1 291,35 − 1 210 = +81,35 € (trop-perçu)' }
+      }
+    ]
+  },
+  {
+    id: 5, diff: 'moyen',
+    titre: 'Arrivée en cours d\'année — Proratisation 9 mois',
+    contexte: [
+      { label: 'Entrée dans les lieux', value: '1er avril (9 mois de présence)' },
+      { label: 'Provision mensuelle', value: '90 €/mois' },
+      { label: 'Charges copro récupérables annuelles', value: '1 080 €' },
+      { label: 'TEOM annuelle', value: '180 €' },
+    ],
+    questions: [
+      {
+        q: 'Total annuel des charges récupérables.',
+        reponse: 1260, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total annuel = copro récupérables + TEOM (charges de l\'immeuble pour 12 mois, indépendamment de la présence du locataire).', formule: '1 080 + 180 = 1 260 €' }
+      },
+      {
+        q: 'Quote-part de charges imputables au locataire (9 mois / 12).',
+        reponse: 945, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Le locataire ne doit payer que la fraction correspondant à sa présence effective.', formule: '1 260 × 9/12 = 945 €' }
+      },
+      {
+        q: 'Provisions versées.',
+        reponse: 810, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions = provision mensuelle × mois de présence.', formule: '90 × 9 = 810 €' }
+      },
+      {
+        q: 'Régularisation (positif = trop-perçu bailleur).',
+        reponse: 135, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Régularisation = quote-part charges − provisions versées.', formule: '945 − 810 = +135 €' }
+      }
+    ]
+  },
+  {
+    id: 6, diff: 'moyen',
+    titre: 'Départ en cours d\'année',
+    contexte: [
+      { label: 'Départ du locataire', value: '31 août (8 mois de présence)' },
+      { label: 'Provision mensuelle', value: '70 €/mois' },
+      { label: 'Charges copro totales', value: '1 200 €' },
+      { label: '% récupérable', value: '60 %' },
+      { label: 'TEOM', value: '120 €' },
+    ],
+    questions: [
+      {
+        q: 'Charges récupérables annuelles (copro + TEOM).',
+        reponse: 840, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Copro récupérables = 1 200 × 60 % = 720 €.', formule: '1 200 × 60 % + 120 = 840 €' }
+      },
+      {
+        q: 'Quote-part de charges pour le locataire (8 mois / 12).',
+        reponse: 560, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Le locataire parti le 31 août ne doit que 8/12 du total annuel.', formule: '840 × 8/12 = 560 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 0, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 70 × 8 = 560 €. Résultat = 0 € → équilibre parfait, aucun mouvement.', formule: '560 − 560 = 0 €' }
+      }
+    ]
+  },
+  {
+    id: 7, diff: 'moyen',
+    titre: 'Calcul du % récupérable + régularisation + N+1',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '55 €/mois' },
+      { label: 'Charges copro totales', value: '1 540 €' },
+      { label: 'dont récupérables', value: '1 078 €' },
+      { label: 'TEOM', value: '162 €' },
+      { label: 'Inflation N+1', value: '+2 %' },
+    ],
+    questions: [
+      {
+        q: '% récupérable des charges de copropriété.',
+        reponse: 70, tolerance: 0.2, unite: '%',
+        aide: { texte: '% récupérable = montant récupérable / total × 100. Ce taux est établi par référence au décret du 26 août 1987.', formule: '1 078 / 1 540 × 100 = 70 %' }
+      },
+      {
+        q: 'Total des charges récupérables (copro + TEOM).',
+        reponse: 1240, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = copro récupérables + TEOM.', formule: '1 078 + 162 = 1 240 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 580, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 55 × 12 = 660 €.', formule: '1 240 − 660 = +580 € (trop-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +2 %, arrondi à l\'€ supérieur).',
+        reponse: 106, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: '1 240 × 1,02 / 12 = 105,40 → arrondi supérieur.', formule: '1 240 × 1,02 / 12 = 105,40 → 106 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 8, diff: 'moyen',
+    titre: 'Provision manifestement sous-évaluée',
+    contexte: [
+      { label: 'Entrée dans les lieux', value: '1er juillet (6 mois de présence)' },
+      { label: 'Provision mensuelle', value: '45 €/mois' },
+      { label: 'Charges copro récupérables annuelles', value: '960 €' },
+      { label: 'TEOM annuelle', value: '144 €' },
+    ],
+    questions: [
+      {
+        q: 'Quote-part de charges imputables au locataire (6 mois / 12).',
+        reponse: 552, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total annuel = 960 + 144 = 1 104 €. Quote-part 6 mois = 1 104 × 6/12.', formule: '(960 + 144) × 6/12 = 552 €' }
+      },
+      {
+        q: 'Provisions versées.',
+        reponse: 270, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions = 45 × 6 = 270 €.', formule: '45 × 6 = 270 €' }
+      },
+      {
+        q: 'Régularisation (positif = trop-perçu).',
+        reponse: 282, tolerance: 0.5, unite: '€',
+        aide: { texte: 'La provision était très insuffisante (45 €) par rapport aux charges réelles. Régularisation = 552 − 270.', formule: '552 − 270 = +282 € (trop-perçu)' }
+      }
+    ]
+  },
+  {
+    id: 9, diff: 'moyen',
+    titre: 'Révision de provision — Historique N',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle (trop basse)', value: '55 €/mois' },
+      { label: 'Charges copro récupérables N', value: '924 €' },
+      { label: 'TEOM N', value: '138 €' },
+    ],
+    questions: [
+      {
+        q: 'Total des charges récupérables pour l\'année N.',
+        reponse: 1062, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total N = copro récupérables + TEOM.', formule: '924 + 138 = 1 062 €' }
+      },
+      {
+        q: 'Régularisation pour l\'année N.',
+        reponse: 402, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 55 × 12 = 660 €. La provision de 55 € était manifestement sous-évaluée.', formule: '1 062 − 660 = +402 € (trop-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (sans inflation, arrondi à l\'€ supérieur).',
+        reponse: 89, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: 'Nouvelle provision = charges réelles N / 12 = 1 062 / 12 = 88,50 → arrondi supérieur.', formule: '1 062 / 12 = 88,50 → 89 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 10, diff: 'moyen',
+    titre: 'Bail meublé — Forfait charges (piège !)',
+    contexte: [
+      { label: 'Type de bail', value: 'Location meublée — résidence principale' },
+      { label: 'Mode de charges', value: 'FORFAIT charges (non régularisable)' },
+      { label: 'Forfait mensuel', value: '80 €/mois' },
+      { label: 'Charges réelles copro récupérables', value: '1 040 €' },
+      { label: 'TEOM', value: '160 €' },
+    ],
+    questions: [
+      {
+        q: 'Le bailleur peut-il effectuer une régularisation ? (Saisir 1 = OUI / 0 = NON)',
+        reponse: 0, tolerance: 0, unite: '(1=oui / 0=non)',
+        aide: { texte: 'PIÈGE — En bail meublé résidence principale avec forfait charges, la régularisation est IMPOSSIBLE. Le forfait est définitif. Il peut être révisé annuellement selon l\'IRL, mais jamais régularisé (art. 25-10 loi 6 juillet 1989). Contrairement au bail nu loi 1989 où la régularisation est obligatoire.', formule: 'Forfait meublé → pas de régularisation (art. 25-10)' }
+      },
+      {
+        q: 'Différence entre charges réelles et forfait perçu (perte bailleur non récupérable).',
+        reponse: 240, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Charges réelles = 1 040 + 160 = 1 200 €. Forfait perçu = 80 × 12 = 960 €. Perte définitive bailleur.', formule: '1 200 − 960 = 240 € (non récupérable)' }
+      }
+    ]
+  },
+  {
+    id: 11, diff: 'moyen',
+    titre: 'Copropriété — Répartition par tantièmes',
+    contexte: [
+      { label: 'Charges copro totales immeuble', value: '6 000 €' },
+      { label: 'dont récupérables (décret 1987)', value: '4 200 €' },
+      { label: 'Tantièmes du lot loué', value: '250 / 1 000' },
+      { label: 'TEOM du lot', value: '140 €' },
+      { label: 'Provision mensuelle', value: '100 €' },
+      { label: 'Présence', value: '12 mois' },
+    ],
+    questions: [
+      {
+        q: '% récupérable des charges de l\'immeuble.',
+        reponse: 70, tolerance: 0.2, unite: '%',
+        aide: { texte: '% récupérable = charges récupérables / charges totales immeuble × 100.', formule: '4 200 / 6 000 × 100 = 70 %' }
+      },
+      {
+        q: 'Quote-part des charges totales pour le lot loué (tantièmes).',
+        reponse: 1500, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Quote-part du lot = charges totales immeuble × tantièmes / 1 000.', formule: '6 000 × 250/1 000 = 1 500 €' }
+      },
+      {
+        q: 'Charges récupérables pour ce lot (copro + TEOM).',
+        reponse: 1190, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Charges récupérables du lot = quote-part lot × % récupérable + TEOM = 1 500 × 70 % + 140.', formule: '1 500 × 70 % + 140 = 1 190 €' }
+      },
+      {
+        q: 'Régularisation pour le locataire.',
+        reponse: -10, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €. 1 190 − 1 200 = −10 € → bailleur rembourse 10 € au locataire.', formule: '1 190 − 1 200 = −10 € (bailleur rembourse)' }
+      }
+    ]
+  },
+
+  // ─── DIFFICILES (12-20) ───────────────────────────────────
+  {
+    id: 12, diff: 'difficile',
+    titre: 'Gardiennage 75 % — Décomposition poste par poste',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '100 €/mois' },
+      { label: 'Charges ascenseur (100 % récupérables)', value: '350 €' },
+      { label: 'Charges gardiennage', value: '800 € (75 % récupérable)' },
+      { label: 'Entretien espaces verts (100 % récupérable)', value: '180 €' },
+      { label: 'TEOM', value: '205 €' },
+    ],
+    questions: [
+      {
+        q: 'Part récupérable du gardiennage.',
+        reponse: 600, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Décret 26 août 1987 : le gardiennage est récupérable à 75 % si le gardien assure entretien ET surveillance. Taux réduit à 40 % s\'il n\'assure qu\'une des deux fonctions.', formule: '800 × 75 % = 600 €' }
+      },
+      {
+        q: 'Total des charges récupérables.',
+        reponse: 1335, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = ascenseur + gardiennage (75%) + espaces verts + TEOM.', formule: '350 + 600 + 180 + 205 = 1 335 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 135, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €.', formule: '1 335 − 1 200 = +135 €' }
+      }
+    ]
+  },
+  {
+    id: 13, diff: 'difficile',
+    titre: 'Paiement par douzième — Défaut de régularisation',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '85 €/mois' },
+      { label: 'Charges récupérables N-1 (non régularisées)', value: '1 260 €' },
+      { label: 'Charges copro récupérables N', value: '1 104 €' },
+      { label: 'TEOM N', value: '156 €' },
+    ],
+    questions: [
+      {
+        q: 'Charges récupérables pour l\'année N.',
+        reponse: 1260, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total N = copro récupérables + TEOM.', formule: '1 104 + 156 = 1 260 €' }
+      },
+      {
+        q: 'Régularisation pour l\'année N.',
+        reponse: 240, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées N = 85 × 12 = 1 020 €.', formule: '1 260 − 1 020 = +240 € (trop-perçu)' }
+      },
+      {
+        q: 'Si le bailleur n\'a pas régularisé N-1 dans l\'année civile suivante, par combien d\'échéances le locataire peut-il exiger le règlement ?',
+        reponse: 12, tolerance: 0, unite: 'mensualités',
+        aide: { texte: 'Art. 23, loi du 6 juillet 1989 : en cas de défaut de régularisation au terme de l\'année civile suivant leur exigibilité, le locataire peut exiger le paiement par douzième. Droit protecteur du locataire.', formule: 'Art. 23 loi 1989 → étalement sur 12 mois' }
+      },
+      {
+        q: 'Montant mensuel du rappel N-1 étalé sur 12 mois.',
+        reponse: 105, tolerance: 0.5, unite: '€/mois',
+        aide: { texte: 'Rappel mensuel = charges non régularisées / 12.', formule: '1 260 / 12 = 105 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 14, diff: 'difficile',
+    titre: 'Charges d\'eau individualisées — Compteur',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle (eau + copro)', value: '95 €/mois' },
+      { label: 'Consommation eau (relevé compteur)', value: '142 m³' },
+      { label: 'Prix unitaire eau', value: '3,20 €/m³' },
+      { label: 'Charges copro récupérables (hors eau)', value: '580 €' },
+      { label: 'TEOM', value: '110 €' },
+    ],
+    questions: [
+      {
+        q: 'Montant de l\'eau consommée par le locataire.',
+        reponse: 454.40, tolerance: 0.5, unite: '€',
+        aide: { texte: 'L\'eau est une charge récupérable (décret 1987). Avec compteur individuel, on facture la consommation réelle.', formule: '142 × 3,20 = 454,40 €' }
+      },
+      {
+        q: 'Total des charges récupérables (eau + copro + TEOM).',
+        reponse: 1144.40, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Total = eau + copro hors eau récupérables + TEOM.', formule: '454,40 + 580 + 110 = 1 144,40 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 4.40, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 95 × 12 = 1 140 €. Quasi-équilibre.', formule: '1 144,40 − 1 140 = +4,40 €' }
+      }
+    ]
+  },
+  {
+    id: 15, diff: 'difficile',
+    titre: 'Régularisation + Revenus fonciers (régime réel)',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Loyer mensuel HC', value: '650 €/mois' },
+      { label: 'Provision mensuelle', value: '85 €/mois' },
+      { label: 'Charges copro totales', value: '1 380 €' },
+      { label: 'dont récupérables', value: '1 020 €' },
+      { label: 'TEOM', value: '180 €' },
+    ],
+    questions: [
+      {
+        q: 'Charges récupérables totales (copro récupérables + TEOM).',
+        reponse: 1200, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = copro récupérables + TEOM.', formule: '1 020 + 180 = 1 200 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 180, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 85 × 12 = 1 020 €.', formule: '1 200 − 1 020 = +180 € (trop-perçu)' }
+      },
+      {
+        q: 'Recettes brutes annuelles à déclarer au régime réel (loyers HC + provisions perçues).',
+        reponse: 8820, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Recettes foncières = loyers HC + provisions pour charges versées par le locataire (qu\'elles soient régularisées ou non). Les charges réelles récupérables sont portées en dépenses.', formule: '(650 + 85) × 12 = 735 × 12 = 8 820 €' }
+      },
+      {
+        q: 'Part des charges copropriété NON récupérable (déductible au régime réel).',
+        reponse: 360, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Au régime réel, seule la part des charges copro NON récupérée sur le locataire est déductible. Total copro = 1 380 €. Récupérables = 1 020 €.', formule: '1 380 − 1 020 = 360 € (non récupérable = déductible)' }
+      }
+    ]
+  },
+  {
+    id: 16, diff: 'difficile',
+    titre: 'Changement de locataire en cours d\'année',
+    contexte: [
+      { label: 'Locataire A (sortant)', value: 'Janv → Avril = 4 mois · Prov. 70 €/mois' },
+      { label: 'Locataire B (entrant)', value: 'Mai → Déc. = 8 mois · Prov. 70 €/mois' },
+      { label: 'Charges copro récupérables annuelles', value: '1 680 €' },
+      { label: 'TEOM annuelle', value: '240 €' },
+    ],
+    questions: [
+      {
+        q: 'Total des charges récupérables annuelles.',
+        reponse: 1920, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = 1 680 + 240.', formule: '1 680 + 240 = 1 920 €' }
+      },
+      {
+        q: 'Quote-part du locataire A (4 mois / 12).',
+        reponse: 640, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Quote-part A = 1 920 × 4/12.', formule: '1 920 × 4/12 = 640 €' }
+      },
+      {
+        q: 'Régularisation pour le locataire A.',
+        reponse: 360, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions A = 70 × 4 = 280 €.', formule: '640 − 280 = +360 € (trop-perçu)' }
+      },
+      {
+        q: 'Quote-part du locataire B (8 mois / 12).',
+        reponse: 1280, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Quote-part B = 1 920 × 8/12.', formule: '1 920 × 8/12 = 1 280 €' }
+      },
+      {
+        q: 'Régularisation pour le locataire B.',
+        reponse: 720, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions B = 70 × 8 = 560 €.', formule: '1 280 − 560 = +720 € (trop-perçu)' }
+      }
+    ]
+  },
+  {
+    id: 17, diff: 'difficile',
+    titre: 'Vacance locative — Charges à la charge du bailleur',
+    contexte: [
+      { label: 'Locataire A (sortant)', value: 'Janv → Fév. = 2 mois · Prov. 60 €/mois' },
+      { label: 'Vacance', value: 'Mars → Avril = 2 mois (logement vide)' },
+      { label: 'Locataire B (entrant)', value: 'Mai → Déc. = 8 mois · Prov. 60 €/mois' },
+      { label: 'Charges copro récupérables annuelles', value: '1 440 €' },
+      { label: 'TEOM annuelle', value: '240 €' },
+    ],
+    questions: [
+      {
+        q: 'Total des charges récupérables annuelles.',
+        reponse: 1680, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total = 1 440 + 240.', formule: '1 440 + 240 = 1 680 €' }
+      },
+      {
+        q: 'Quote-part du locataire A (2 mois / 12).',
+        reponse: 280, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Quote-part A = 1 680 × 2/12.', formule: '1 680 × 2/12 = 280 €' }
+      },
+      {
+        q: 'Régularisation pour le locataire A.',
+        reponse: 160, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions A = 60 × 2 = 120 €.', formule: '280 − 120 = +160 € (trop-perçu)' }
+      },
+      {
+        q: 'Charges pendant la vacance (2 mois) — montant à la charge exclusive du bailleur.',
+        reponse: 280, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Pendant la vacance locative, il n\'y a pas de locataire. Les charges sont INTÉGRALEMENT à la charge du bailleur. Elles ne peuvent être imputées ni à A ni à B.', formule: '1 680 × 2/12 = 280 € → charge exclusive du bailleur' }
+      },
+      {
+        q: 'Régularisation pour le locataire B (8 mois / 12).',
+        reponse: 640, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Quote-part B = 1 680 × 8/12 = 1 120 €. Provisions B = 60 × 8 = 480 €.', formule: '1 120 − 480 = +640 € (trop-perçu)' }
+      }
+    ]
+  },
+  {
+    id: 18, diff: 'difficile',
+    titre: 'Gros travaux vs charges récupérables — Distinction',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '120 €/mois' },
+      { label: 'Charges chauffage collectif', value: '2 400 € (60 % récupérables)' },
+      { label: 'Entretien chaudière (100 % récupérable)', value: '360 €' },
+      { label: 'Ravalement façade', value: '1 800 € (NON récupérable — gros travaux)' },
+      { label: 'TEOM', value: '190 €' },
+    ],
+    questions: [
+      {
+        q: 'Part récupérable des charges de chauffage collectif.',
+        reponse: 1440, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Le chauffage collectif est récupérable à 60 % (décret 1987 — charges liées à l\'usage des équipements communs).', formule: '2 400 × 60 % = 1 440 €' }
+      },
+      {
+        q: 'Total des charges récupérables (chauffage + entretien chaudière + TEOM). Le ravalement est exclu.',
+        reponse: 1990, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Le ravalement de façade = travaux de gros entretien → NON récupérable sur le locataire (décret 1987). Total = 1 440 + 360 + 190.', formule: '1 440 + 360 + 190 = 1 990 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 550, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 120 × 12 = 1 440 €.', formule: '1 990 − 1 440 = +550 € (trop-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +2 %, arrondi à l\'€ supérieur).',
+        reponse: 170, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: '1 990 × 1,02 / 12 = 169,15 → arrondi supérieur.', formule: '1 990 × 1,02 / 12 = 169,15 → 170 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 19, diff: 'difficile',
+    titre: 'Simulation prospective N+1 et N+2',
+    contexte: [
+      { label: 'Présence locataire', value: '12 mois' },
+      { label: 'Provision mensuelle', value: '110 €/mois' },
+      { label: 'Charges copro récupérables', value: '1 450 €' },
+      { label: 'TEOM', value: '230 €' },
+      { label: 'Inflation N+1', value: '+3 %' },
+      { label: 'Inflation N+2', value: '+2 %' },
+    ],
+    questions: [
+      {
+        q: 'Régularisation pour l\'année N.',
+        reponse: 360, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Charges réelles = 1 450 + 230 = 1 680 €. Provisions = 110 × 12 = 1 320 €.', formule: '1 680 − 1 320 = +360 €' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +3 %, arrondi à l\'€ supérieur).',
+        reponse: 145, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: '1 680 × 1,03 / 12 = 144,20 → arrondi supérieur.', formule: '1 680 × 1,03 / 12 = 144,20 → 145 €/mois' }
+      },
+      {
+        q: 'Charges prévisionnelles estimées pour N+1.',
+        reponse: 1730.40, tolerance: 1, unite: '€',
+        aide: { texte: 'Charges estimées N+1 = charges réelles N × (1 + inflation N+1).', formule: '1 680 × 1,03 = 1 730,40 €' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+2 (base charges N+1, inflation +2 %, arrondi à l\'€ supérieur).',
+        reponse: 148, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: 'Provision N+2 = charges estimées N+1 × 1,02 / 12.', formule: '1 730,40 × 1,02 / 12 = 147,09 → 148 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 20, diff: 'difficile',
+    titre: 'Cas synthèse — % + proratisation + N+1 (tout en un)',
+    contexte: [
+      { label: 'Entrée dans les lieux', value: '1er mars (10 mois de présence)' },
+      { label: 'Provision mensuelle', value: '95 €/mois' },
+      { label: 'Charges copro totales', value: '2 040 €' },
+      { label: '(dont récupérables)', value: '1 428 € — taux à calculer' },
+      { label: 'TEOM', value: '204 €' },
+      { label: 'Inflation N+1', value: '+1,5 %' },
+    ],
+    questions: [
+      {
+        q: '% récupérable des charges de copropriété.',
+        reponse: 70, tolerance: 0.2, unite: '%',
+        aide: { texte: '% récupérable = 1 428 / 2 040 × 100.', formule: '1 428 / 2 040 × 100 = 70 %' }
+      },
+      {
+        q: 'Total annuel des charges récupérables (copro + TEOM).',
+        reponse: 1632, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Total annuel = 1 428 + 204.', formule: '1 428 + 204 = 1 632 €' }
+      },
+      {
+        q: 'Quote-part imputable au locataire (10 mois / 12).',
+        reponse: 1360, tolerance: 0.5, unite: '€',
+        aide: { texte: '1 632 × 10/12.', formule: '1 632 × 10/12 = 1 360 €' }
+      },
+      {
+        q: 'Régularisation.',
+        reponse: 410, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 95 × 10 = 950 €.', formule: '1 360 − 950 = +410 €' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 — base charges annuelles 12 mois + inflation +1,5 %, arrondie à l\'€ supérieur.',
+        reponse: 139, tolerance: 0.6, unite: '€/mois',
+        aide: { texte: 'La provision se base sur les charges ANNUELLES (12 mois), pas sur la quote-part du locataire.', formule: '1 632 × 1,015 / 12 = 138,06 → 139 €/mois' }
+      }
+    ]
+  }
+  // ─── EXTRÊMES (21-25) ────────────────────────────────────
+  ,{
+    id: 21, diff: 'extreme',
+    titre: 'Appartement seul — Relevé complet style logiciel',
+    note: 'Aucune indication de calcul. Reproduire le travail d\'un logiciel de gestion locative. Toutes les charges sont à ventiler selon le décret du 26 août 1987.',
+    contexte: [
+      { label: 'Locataire', value: 'M. BERNARD Paul' },
+      { label: 'Lot', value: 'Appt 3 — 2ème étage' },
+      { label: 'Entrée', value: '15 mars 2024' },
+      { label: 'Sortie', value: '31 décembre 2024' },
+      { label: 'Provision mensuelle', value: '130 €/mois' },
+      { label: 'Tantièmes du lot', value: '180 / 1 000' },
+    ],
+    tableau: `<div class="section-titre">📋 Relevé annuel de charges — Immeuble (2024)</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste de charge</th>
+  <th>Montant total immeuble</th>
+  <th>Décret 1987</th>
+  <th>% récupérable</th>
+  <th>Montant récupérable immeuble</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide parties communes</td><td>1 840,00 €</td><td>Art. 1 liste I</td><td class="td-pct">100 %</td><td class="rec">1 840,00 €</td></tr>
+<tr><td class="td-poste">Eau chaude collective</td><td>2 640,00 €</td><td>Art. 1 liste I</td><td class="td-pct">100 %</td><td class="rec">2 640,00 €</td></tr>
+<tr><td class="td-poste">Électricité parties communes</td><td>980,00 €</td><td>Art. 1 liste II</td><td class="td-pct">100 %</td><td class="rec">980,00 €</td></tr>
+<tr><td class="td-poste">Entretien ascenseur (contrat)</td><td>1 560,00 €</td><td>Art. 1 liste II</td><td class="td-pct">100 %</td><td class="rec">1 560,00 €</td></tr>
+<tr><td class="td-poste">Gardien (entretien + surveillance)</td><td>14 400,00 €</td><td>Art. 1 liste III</td><td class="td-pct">75 %</td><td class="rec">10 800,00 €</td></tr>
+<tr><td class="td-poste">Nettoyage parties communes</td><td>2 200,00 €</td><td>Art. 1 liste II</td><td class="td-pct">100 %</td><td class="rec">2 200,00 €</td></tr>
+<tr><td class="td-poste">Espaces verts (entretien)</td><td>1 800,00 €</td><td>Art. 1 liste II</td><td class="td-pct">100 %</td><td class="rec">1 800,00 €</td></tr>
+<tr><td class="td-poste">Ravalement façade</td><td>18 000,00 €</td><td>Gros travaux</td><td class="td-pct nr">0 %</td><td class="nr">0,00 €</td></tr>
+<tr><td class="td-poste">TEOM (immeuble entier)</td><td>3 600,00 €</td><td>Art. 1 liste III</td><td class="td-pct">100 %</td><td class="rec">3 600,00 €</td></tr>
+<tr class="tr-total"><td class="td-poste" style="color:white;font-family:'Syne',sans-serif;">TOTAL RÉCUPÉRABLE</td><td></td><td></td><td></td><td>23 380,00 €</td></tr>
+</tbody></table></div>`,
+    questions: [
+      {
+        q: 'Calculez la quote-part des charges récupérables imputables au lot de M. BERNARD (180 tantièmes / 1000).',
+        reponse: 4208.40, tolerance: 1, unite: '€',
+        aide: { texte: 'Total récupérable immeuble = 23 380 €. Quote-part lot = 23 380 × 180/1000.', formule: '23 380 × 180/1000 = 4 208,40 €' }
+      },
+      {
+        q: 'Calculez le nombre de jours de présence de M. BERNARD (entrée 15 mars, sortie 31 déc 2024 — jour de sortie inclus, 2024 = année bissextile = 366 jours).',
+        reponse: 292, tolerance: 0, unite: 'jours',
+        aide: { texte: 'Mars : du 15 au 31 = 17 jours. Avril : 30j. Mai : 31j. Juin : 30j. Juillet : 31j. Août : 31j. Septembre : 30j. Octobre : 31j. Novembre : 30j. Décembre : 31j.', formule: '17+30+31+30+31+31+30+31+30+31 = 292 jours' }
+      },
+      {
+        q: 'Charges récupérables imputables à M. BERNARD (proratisation 292 jours / 366).',
+        reponse: 3356.61, tolerance: 2, unite: '€',
+        aide: { texte: 'Quote-part lot = 4 208,40 €. Proratisation par jours réels : 4 208,40 × 292/366.', formule: '4 208,40 × 292/366 = 3 356,61 €' }
+      },
+      {
+        q: 'Provisions versées par M. BERNARD. Mars partiel : 130 × 17/31. Puis 9 mois complets (avr→déc).',
+        reponse: 1241.29, tolerance: 2, unite: '€',
+        aide: { texte: 'Mars partiel = 130 × 17/31 = 71,29 €. Mois complets avr à déc = 9 × 130 = 1 170 €.', formule: '(130 × 17/31) + (9 × 130) = 71,29 + 1 170 = 1 241,29 €' }
+      },
+      {
+        q: 'Régularisation pour M. BERNARD (positif = trop-perçu bailleur).',
+        reponse: 2115.32, tolerance: 3, unite: '€',
+        aide: { texte: 'Régularisation = charges imputables − provisions versées.', formule: '3 356,61 − 1 241,29 = +2 115,32 € (trop-perçu)' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 — base charges annuelles 12 mois du lot, inflation +2 %, arrondi €supérieur.',
+        reponse: 358, tolerance: 1, unite: '€/mois',
+        aide: { texte: 'Base = quote-part lot annuelle 4 208,40 €. Provision N+1 = 4 208,40 × 1,02 / 12.', formule: '4 208,40 × 1,02 / 12 = 357,71 → 358 €/mois' }
+      }
+    ]
+  },
+  {
+    id: 22, diff: 'extreme',
+    titre: 'Immeuble 3 lots — Clés de répartition distinctes par lot',
+    note: 'Immeuble monopropriété. Chaque lot a ses charges propres. Lot A (RDC) sans ascenseur. Lot C a accès exclusif aux espaces verts. Gardien entretien seulement = 40 %. TEOM individuelle par lot.',
+    contexte: [
+      { label: 'Lot A — RDC', value: '220 tant. — Pas d\'ascenseur' },
+      { label: 'Lot B — 1er étage', value: '390 tant. — Ascenseur' },
+      { label: 'Lot C — 2ème + jardin', value: '390 tant. — Ascenseur + espaces verts' },
+      { label: 'Total tantièmes', value: '1 000' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges annuelles immeuble 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Total</th><th>%Récup.</th><th>Récupérable total</th><th>Clé de répartition</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide (conso collective)</td><td>2 400 €</td><td class="td-pct">100 %</td><td class="rec">2 400 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Électricité parties communes</td><td>720 €</td><td class="td-pct">100 %</td><td class="rec">720 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Entretien ascenseur</td><td>1 800 €</td><td class="td-pct">100 %</td><td class="rec">1 800 €</td><td>Lots B et C uniquement (50/50)</td></tr>
+<tr><td class="td-poste">Gardien (entretien seul)</td><td>8 400 €</td><td class="td-pct">40 %</td><td class="rec">3 360 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Espaces verts</td><td>1 200 €</td><td class="td-pct">100 %</td><td class="rec">1 200 €</td><td>Lot C exclusivement</td></tr>
+<tr><td class="td-poste">Nettoyage cages d'escalier</td><td>960 €</td><td class="td-pct">100 %</td><td class="rec">960 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Interphone / digicode</td><td>380 €</td><td class="td-pct">100 %</td><td class="rec">380 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Ramonage cheminée</td><td>180 €</td><td class="td-pct">100 %</td><td class="rec">180 €</td><td>Lot A uniquement</td></tr>
+<tr><td class="td-poste">TEOM — Lot A</td><td>145 €</td><td class="td-pct">100 %</td><td class="rec">145 €</td><td>Lot A</td></tr>
+<tr><td class="td-poste">TEOM — Lot B</td><td>190 €</td><td class="td-pct">100 %</td><td class="rec">190 €</td><td>Lot B</td></tr>
+<tr><td class="td-poste">TEOM — Lot C</td><td>210 €</td><td class="td-pct">100 %</td><td class="rec">210 €</td><td>Lot C</td></tr>
+<tr><td class="td-poste">Ravalement façade</td><td>24 000 €</td><td class="td-pct nr">0 %</td><td class="nr">— N.R. —</td><td>—</td></tr>
+</tbody></table></div>
+<div class="section-titre" style="margin-top:16px;">👤 Données locataires</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT A</span>Mme DUPONT — RDC — 220 tant. — 12 mois — Prov. 80 €/mois</div>
+</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT B</span>M. MARTIN — 1er — 390 tant. — Entrée 1er avril (9 mois, 275 j/366 j) — Prov. 150 €/mois</div>
+</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT C</span>M. et Mme LEROY — 2ème — 390 tant. — 12 mois — Prov. 180 €/mois</div>
+</div>`,
+    questions: [
+      {
+        q: 'LOT A — Charges récupérables Mme DUPONT : calculez le total des postes en tantièmes généraux (220/1000) : eau + électricité + gardien 40% + nettoyage + interphone.',
+        reponse: 1720.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Récupérable général = eau(2400)+élec(720)+gardien(3360)+nettoyage(960)+interphone(380) = 7820 €. Quote-part A = 7820 × 220/1000.', formule: '7 820 × 220/1000 = 1 720,40 €' }
+      },
+      {
+        q: 'LOT A — Total charges récupérables Mme DUPONT (tantièmes + ramonage spécifique + TEOM A). Pas d\'ascenseur, pas d\'espaces verts.',
+        reponse: 2045.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Total = tantièmes généraux (1720,40) + ramonage lot A (180) + TEOM A (145). Pas d\'ascenseur ni espaces verts.', formule: '1 720,40 + 180 + 145 = 2 045,40 €' }
+      },
+      {
+        q: 'LOT A — Régularisation Mme DUPONT (12 mois × 80 €).',
+        reponse: 1085.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 80 × 12 = 960 €.', formule: '2 045,40 − 960 = +1 085,40 € (trop-perçu)' }
+      },
+      {
+        q: 'LOT B — Charges récupérables M. MARTIN : tantièmes généraux (390/1000) pour les postes eau + élec + gardien + nettoyage + interphone.',
+        reponse: 3049.80, tolerance: 2, unite: '€',
+        aide: { texte: '7 820 × 390/1000 = 3 049,80 €.', formule: '7 820 × 390/1000 = 3 049,80 €' }
+      },
+      {
+        q: 'LOT B — Ascenseur : lots B et C partagent à 50/50. Quote-part ascenseur lot B.',
+        reponse: 900, tolerance: 1, unite: '€',
+        aide: { texte: 'Ascenseur récupérable = 1800 €. Lots B et C à parts égales = 1800/2.', formule: '1 800 / 2 = 900 €' }
+      },
+      {
+        q: 'LOT B — Total charges récupérables annuelles (tantièmes + ascenseur + TEOM B). Pas d\'espaces verts.',
+        reponse: 4139.80, tolerance: 2, unite: '€',
+        aide: { texte: 'Total = tantièmes(3049,80) + ascenseur(900) + TEOM B(190).', formule: '3 049,80 + 900 + 190 = 4 139,80 €' }
+      },
+      {
+        q: 'LOT B — Charges imputables à M. MARTIN (présent 275 jours / 366).',
+        reponse: 3110.81, tolerance: 3, unite: '€',
+        aide: { texte: 'M. MARTIN : 1er avr → 31 déc = avr(30)+mai(31)+juin(30)+juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 275 jours.', formule: '4 139,80 × 275/366 = 3 110,81 €' }
+      },
+      {
+        q: 'LOT B — Régularisation M. MARTIN (9 mois × 150 €).',
+        reponse: 1760.81, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 150 × 9 = 1 350 €.', formule: '3 110,81 − 1 350 = +1 760,81 € (trop-perçu)' }
+      },
+      {
+        q: 'LOT C — Total charges récupérables M. et Mme LEROY (tantièmes généraux + ascenseur + espaces verts exclusifs + TEOM C).',
+        reponse: 5359.80, tolerance: 2, unite: '€',
+        aide: { texte: 'Tantièmes généraux = 7820 × 390/1000 = 3049,80. Ascenseur = 900. Espaces verts = 1200 (exclusif lot C). TEOM C = 210.', formule: '3 049,80 + 900 + 1 200 + 210 = 5 359,80 €' }
+      },
+      {
+        q: 'LOT C — Régularisation M. et Mme LEROY (12 mois × 180 €).',
+        reponse: 3199.80, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 180 × 12 = 2 160 €.', formule: '5 359,80 − 2 160 = +3 199,80 € (trop-perçu)' }
+      }
+    ]
+  },
+  {
+    id: 23, diff: 'extreme',
+    titre: 'Immeuble 4 lots — Eau individualisée par compteur',
+    note: 'Compteurs d\'eau individuels par appartement : eau facturée au réel (m³ × prix). Charges collectives en tantièmes. Proratisation jours réels pour 2 locataires. TEOM individuelle par lot.',
+    contexte: [
+      { label: 'Lot 1 — RDC Droite', value: '210 tant.' },
+      { label: 'Lot 2 — RDC Gauche', value: '210 tant.' },
+      { label: 'Lot 3 — 1er Droite', value: '290 tant.' },
+      { label: 'Lot 4 — 1er Gauche', value: '290 tant.' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges collectives 2024 (hors eau individuelle)</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste collectif</th><th>Total</th><th>% Récup.</th><th>Récupérable</th><th>Clé</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide parties communes</td><td>480 €</td><td class="td-pct">100 %</td><td class="rec">480 €</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Électricité (éclairage + VMC)</td><td>1 320 €</td><td class="td-pct">100 %</td><td class="rec">1 320 €</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Entretien chaudière</td><td>840 €</td><td class="td-pct">100 %</td><td class="rec">840 €</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Nettoyage parties communes</td><td>1 680 €</td><td class="td-pct">100 %</td><td class="rec">1 680 €</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Interphone / portail</td><td>540 €</td><td class="td-pct">100 %</td><td class="rec">540 €</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Assurance immeuble</td><td>2 400 €</td><td class="td-pct nr">0 %</td><td class="nr">— N.R. —</td><td>—</td></tr>
+<tr class="tr-subtotal"><td class="td-poste">Sous-total récupérable collectif</td><td colspan="2"></td><td>4 860 €</td><td></td></tr>
+</tbody></table></div>
+<div class="section-titre" style="margin-top:14px;">💧 Eau — Relevés compteurs 2024 (3,45 €/m³)</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr><th>Lot</th><th>Conso (m³)</th><th>Prix/m³</th><th>Montant eau</th></tr></thead>
+<tbody>
+<tr><td class="td-poste">Lot 1</td><td>98 m³</td><td>3,45 €</td><td class="rec">338,10 €</td></tr>
+<tr><td class="td-poste">Lot 2</td><td>124 m³</td><td>3,45 €</td><td class="rec">427,80 €</td></tr>
+<tr><td class="td-poste">Lot 3</td><td>87 m³</td><td>3,45 €</td><td class="rec">300,15 €</td></tr>
+<tr><td class="td-poste">Lot 4</td><td>156 m³</td><td>3,45 €</td><td class="rec">538,20 €</td></tr>
+</tbody></table></div>
+<div class="section-titre" style="margin-top:14px;">👤 Locataires</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT 1</span>Mme GARCIA — 12 mois — Prov. 95 €/mois — TEOM 168 €</div>
+</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT 2</span>M. PETIT — 12 mois — Prov. 95 €/mois — TEOM 168 €</div>
+</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT 3</span>Mme THOMAS — Entrée 1er juillet (184 j / 366 j) — Prov. 120 €/mois (6 mois) — TEOM 195 €</div>
+</div>
+<div class="locataire-card">
+  <div class="locataire-title"><span class="lot-badge">LOT 4</span>M. ROUX — 12 mois — Prov. 135 €/mois — TEOM 195 €</div>
+</div>`,
+    questions: [
+      {
+        q: 'LOT 1 — Mme GARCIA : charges collectives (4860 × 210/1000) + eau compteur + TEOM. Total.',
+        reponse: 1526.70, tolerance: 2, unite: '€',
+        aide: { texte: 'Collectif = 4860 × 210/1000 = 1020,60 €. Eau = 338,10 €. TEOM = 168 €.', formule: '1 020,60 + 338,10 + 168 = 1 526,70 €' }
+      },
+      {
+        q: 'LOT 1 — Régularisation Mme GARCIA (12 mois × 95 €).',
+        reponse: 386.70, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 95 × 12 = 1 140 €.', formule: '1 526,70 − 1 140 = +386,70 €' }
+      },
+      {
+        q: 'LOT 2 — M. PETIT : charges collectives + eau compteur + TEOM. Total.',
+        reponse: 1616.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Collectif = 1020,60 €. Eau = 427,80 €. TEOM = 168 €.', formule: '1 020,60 + 427,80 + 168 = 1 616,40 €' }
+      },
+      {
+        q: 'LOT 2 — Régularisation M. PETIT.',
+        reponse: 476.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 95 × 12 = 1 140 €.', formule: '1 616,40 − 1 140 = +476,40 €' }
+      },
+      {
+        q: 'LOT 3 — Charges collectives annuelles lot (4860 × 290/1000).',
+        reponse: 1409.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Quote-part collectif lot 3.', formule: '4 860 × 290/1000 = 1 409,40 €' }
+      },
+      {
+        q: 'LOT 3 — Quote-part collectif imputables à Mme THOMAS (184 jours / 366 — présence juil à déc).',
+        reponse: 707.96, tolerance: 2, unite: '€',
+        aide: { texte: 'juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 184 jours.', formule: '1 409,40 × 184/366 = 707,96 €' }
+      },
+      {
+        q: 'LOT 3 — TEOM proratisée Mme THOMAS (195 € × 184/366).',
+        reponse: 97.98, tolerance: 1, unite: '€',
+        aide: { texte: 'TEOM proratisée selon présence réelle.', formule: '195 × 184/366 = 97,98 €' }
+      },
+      {
+        q: 'LOT 3 — Total charges imputables Mme THOMAS (collectif proratisé + eau compteur réel + TEOM proratisée). L\'eau compteur n\'est pas proratisée : c\'est un relevé réel.',
+        reponse: 1106.09, tolerance: 2, unite: '€',
+        aide: { texte: 'Eau = relevé réel = 300,15 € (non proratisée, c\'est la consommation mesurée). Collectif proratisé = 707,96 €. TEOM = 97,98 €.', formule: '707,96 + 300,15 + 97,98 = 1 106,09 €' }
+      },
+      {
+        q: 'LOT 3 — Régularisation Mme THOMAS (6 mois × 120 €).',
+        reponse: 386.09, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 120 × 6 = 720 €.', formule: '1 106,09 − 720 = +386,09 €' }
+      },
+      {
+        q: 'LOT 4 — M. ROUX : total charges récupérables (12 mois, 290 tantièmes + eau + TEOM).',
+        reponse: 2142.60, tolerance: 2, unite: '€',
+        aide: { texte: 'Collectif = 1409,40 €. Eau = 538,20 €. TEOM = 195 €.', formule: '1 409,40 + 538,20 + 195 = 2 142,60 €' }
+      },
+      {
+        q: 'LOT 4 — Régularisation M. ROUX (12 mois × 135 €).',
+        reponse: 522.60, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 135 × 12 = 1 620 €.', formule: '2 142,60 − 1 620 = +522,60 €' }
+      }
+    ]
+  },
+  {
+    id: 24, diff: 'extreme',
+    titre: 'Immeuble 5 lots — Chauffage collectif + tantièmes thermiques + vacance',
+    note: 'Le chauffage et l\'eau chaude sont répartis selon des tantièmes THERMIQUES distincts des tantièmes généraux. Le lot 3 a été vacant 3 mois (jan-mars) : charges vacance à la charge du bailleur.',
+    contexte: [
+      { label: 'Tantièmes généraux', value: 'L1=180 / L2=200 / L3=200 / L4=220 / L5=200 — Total 1000' },
+      { label: 'Tantièmes thermiques', value: 'L1=150 / L2=200 / L3=200 / L4=250 / L5=200 — Total 1000' },
+      { label: 'Lot 3', value: 'Vacant jan-mars. Locataire M. FONTAINE entré le 1er avril (275 j/366 j)' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges annuelles 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Total</th><th>% Récup.</th><th>Récupérable</th><th>Clé</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Chauffage collectif fioul</td><td>18 600 €</td><td class="td-pct">100 %</td><td class="rec">18 600 €</td><td>Tantièmes THERMIQUES</td></tr>
+<tr><td class="td-poste">Eau chaude collective</td><td>4 800 €</td><td class="td-pct">100 %</td><td class="rec">4 800 €</td><td>Tantièmes THERMIQUES</td></tr>
+<tr><td class="td-poste">Eau froide collective</td><td>2 160 €</td><td class="td-pct">100 %</td><td class="rec">2 160 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Électricité parties communes</td><td>1 440 €</td><td class="td-pct">100 %</td><td class="rec">1 440 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Gardien (entretien + surveillance)</td><td>21 600 €</td><td class="td-pct">75 %</td><td class="rec">16 200 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Nettoyage + produits</td><td>2 400 €</td><td class="td-pct">100 %</td><td class="rec">2 400 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Espaces verts</td><td>3 600 €</td><td class="td-pct">100 %</td><td class="rec">3 600 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Ascenseur (contrat)</td><td>2 400 €</td><td class="td-pct">100 %</td><td class="rec">2 400 €</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Ravalement + toiture</td><td>45 000 €</td><td class="td-pct nr">0 %</td><td class="nr">— N.R. —</td><td>—</td></tr>
+</tbody></table></div>
+<div class="locataire-card" style="margin-top:16px;">
+  <div class="locataire-title"><span class="lot-badge">LOT 3</span>M. FONTAINE — 200 tant. gén. / 200 tant. therm. — Entrée 1er avril — Prov. 290 €/mois (9 mois) — TEOM 186 €</div>
+</div>`,
+    questions: [
+      {
+        q: 'LOT 3 — Chauffage (tantièmes thermiques 200/1000).',
+        reponse: 3720, tolerance: 1, unite: '€',
+        aide: { texte: '18 600 × 200/1000.', formule: '18 600 × 200/1000 = 3 720 €' }
+      },
+      {
+        q: 'LOT 3 — Eau chaude (tantièmes thermiques 200/1000).',
+        reponse: 960, tolerance: 1, unite: '€',
+        aide: { texte: '4 800 × 200/1000.', formule: '4 800 × 200/1000 = 960 €' }
+      },
+      {
+        q: 'LOT 3 — Charges aux tantièmes généraux (200/1000) : eau froide + électricité + gardien 75% + nettoyage + espaces verts + ascenseur.',
+        reponse: 5240, tolerance: 2, unite: '€',
+        aide: { texte: 'Récupérable général total = 2160+1440+16200+2400+3600+2400 = 28 200 €. Hmm : gardien 21600×75%=16200. Total = 2160+1440+16200+2400+3600+2400 = 28 200. Quote-part lot 3 = 28200 × 200/1000 = 5640 €. Attention : vérifier. Eau(2160)+élec(1440)+gardien(16200)+nettoyage(2400)+esp.verts(3600)+asc(2400) = 26 200. Quote-part = 26200×200/1000 = 5240.', formule: '26 200 × 200/1000 = 5 240 €' }
+      },
+      {
+        q: 'LOT 3 — Total charges récupérables annuelles (thermique + général + TEOM).',
+        reponse: 10106, tolerance: 2, unite: '€',
+        aide: { texte: 'Total = chauffage(3720) + eau chaude(960) + général(5240) + TEOM(186).', formule: '3 720 + 960 + 5 240 + 186 = 10 106 €' }
+      },
+      {
+        q: 'LOT 3 — Charges imputables à M. FONTAINE (275 jours / 366). Les 91 jours de vacance sont à charge du bailleur.',
+        reponse: 7593.17, tolerance: 5, unite: '€',
+        aide: { texte: '1er avr → 31 déc = avr(30)+mai(31)+juin(30)+juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 275 jours.', formule: '10 106 × 275/366 = 7 593,17 €' }
+      },
+      {
+        q: 'LOT 3 — Charges pendant la vacance (91 jours jan-mars) — à la charge exclusive du bailleur.',
+        reponse: 2512.83, tolerance: 5, unite: '€',
+        aide: { texte: 'jan(31)+fév(29)+mars(31) = 91 jours. Ces charges ne peuvent être réclamées à aucun locataire.', formule: '10 106 × 91/366 = 2 512,83 € → bailleur' }
+      },
+      {
+        q: 'LOT 3 — Régularisation M. FONTAINE (9 mois × 290 €).',
+        reponse: 4983.17, tolerance: 5, unite: '€',
+        aide: { texte: 'Provisions = 290 × 9 = 2 610 €.', formule: '7 593,17 − 2 610 = +4 983,17 € (trop-perçu massif)' }
+      }
+    ]
+  },
+  {
+    id: 25, diff: 'extreme',
+    titre: 'Immeuble 5 lots — Synthèse complète + flux bailleur',
+    note: 'Cas de synthèse finale. 5 locataires, présences variables, tantièmes distincts. Calculer la régularisation individuelle de chacun, puis la synthèse bailleur : total flux à décaisser, et nouvelle provision la plus sous-évaluée.',
+    contexte: [
+      { label: 'Tantièmes', value: 'L1=150 / L2=200 / L3=250 / L4=200 / L5=200 — Total 1000' },
+      { label: 'Charges récupérables immeuble', value: '38 400 € (total déjà calculé, tous postes confondus)' },
+      { label: 'TEOM', value: 'Individuelle par lot — voir tableau' },
+    ],
+    tableau: `<div class="section-titre">📋 Relevé locataires — Immeuble VICTOR HUGO 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th>Lot</th><th>Tant.</th><th>Locataire</th><th>Présence</th><th>Jours/366</th><th>Prov. €/mois</th><th>Mois payés</th><th>TEOM</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Lot 1</td><td>150</td><td>Mme ALBERT</td><td>12 mois</td><td>366/366</td><td>180</td><td>12</td><td>145 €</td></tr>
+<tr><td class="td-poste">Lot 2</td><td>200</td><td>M. BESSON</td><td>1er mars → 31 déc</td><td>306/366</td><td>210</td><td>10</td><td>172 €</td></tr>
+<tr><td class="td-poste">Lot 3</td><td>250</td><td>Mme CAROL</td><td>12 mois</td><td>366/366</td><td>280</td><td>12</td><td>198 €</td></tr>
+<tr><td class="td-poste">Lot 4</td><td>200</td><td>M. DUMAS</td><td>1er juil. → 31 déc</td><td>184/366</td><td>210</td><td>6</td><td>172 €</td></tr>
+<tr><td class="td-poste">Lot 5</td><td>200</td><td>Mme ERNST</td><td>12 mois</td><td>366/366</td><td>250</td><td>12</td><td>172 €</td></tr>
+</tbody></table></div>
+<div class="cas-note"><strong>Méthode :</strong> Quote-part lot = 38 400 × tantièmes/1000. Si présence partielle : × jours/366. TEOM proratisée selon présence. Provisions = mensuelle × mois payés.</div>`,
+    questions: [
+      {
+        q: 'LOT 1 — Mme ALBERT : charges récupérables (38400 × 150/1000 + TEOM 145 €).',
+        reponse: 5905, tolerance: 2, unite: '€',
+        aide: { texte: '38400 × 150/1000 = 5760 €. + TEOM 145 €.', formule: '5 760 + 145 = 5 905 €' }
+      },
+      {
+        q: 'LOT 1 — Régularisation Mme ALBERT.',
+        reponse: 3745, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 180 × 12 = 2 160 €.', formule: '5 905 − 2 160 = +3 745 €' }
+      },
+      {
+        q: 'LOT 2 — M. BESSON : quote-part annuelle (38400 × 200/1000) + TEOM 172 €. Total annuel brut.',
+        reponse: 7852, tolerance: 2, unite: '€',
+        aide: { texte: '38400 × 200/1000 = 7680 €. + TEOM 172 €.', formule: '7 680 + 172 = 7 852 €' }
+      },
+      {
+        q: 'LOT 2 — Charges imputables M. BESSON (proratisation 306 jours / 366).',
+        reponse: 6561.97, tolerance: 3, unite: '€',
+        aide: { texte: '1er mars → 31 déc : mars(31)+avr(30)+...+déc(31) = 306 jours.', formule: '7 852 × 306/366 = 6 561,97 €' }
+      },
+      {
+        q: 'LOT 2 — Régularisation M. BESSON (10 mois × 210 €).',
+        reponse: 4461.97, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 210 × 10 = 2 100 €.', formule: '6 561,97 − 2 100 = +4 461,97 €' }
+      },
+      {
+        q: 'LOT 3 — Mme CAROL : total charges récupérables (38400 × 250/1000 + TEOM 198 €).',
+        reponse: 9798, tolerance: 2, unite: '€',
+        aide: { texte: '38400 × 250/1000 = 9600 €. + TEOM 198 €.', formule: '9 600 + 198 = 9 798 €' }
+      },
+      {
+        q: 'LOT 3 — Régularisation Mme CAROL.',
+        reponse: 6438, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 280 × 12 = 3 360 €.', formule: '9 798 − 3 360 = +6 438 €' }
+      },
+      {
+        q: 'LOT 4 — M. DUMAS : charges imputables (38400 × 200/1000 + TEOM 172 €) proratisées 184 jours / 366.',
+        reponse: 3945.12, tolerance: 3, unite: '€',
+        aide: { texte: 'Total annuel = 7680 + 172 = 7852 €. Proratisé = 7852 × 184/366.', formule: '7 852 × 184/366 = 3 945,12 €' }
+      },
+      {
+        q: 'LOT 4 — Régularisation M. DUMAS (6 mois × 210 €).',
+        reponse: 2685.12, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 210 × 6 = 1 260 €.', formule: '3 945,12 − 1 260 = +2 685,12 €' }
+      },
+      {
+        q: 'LOT 5 — Mme ERNST : total charges récupérables (38400 × 200/1000 + TEOM 172 €).',
+        reponse: 7852, tolerance: 2, unite: '€',
+        aide: { texte: '38400 × 200/1000 = 7680 €. + TEOM 172 €.', formule: '7 680 + 172 = 7 852 €' }
+      },
+      {
+        q: 'LOT 5 — Régularisation Mme ERNST.',
+        reponse: 4852, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 250 × 12 = 3 000 €.', formule: '7 852 − 3 000 = +4 852 €' }
+      },
+      {
+        q: 'SYNTHÈSE BAILLEUR — Total des trop-perçus à rembourser aux 5 locataires.',
+        reponse: 22182.09, tolerance: 15, unite: '€',
+        aide: { texte: 'Tous les locataires ont un trop-perçu : provisions insuffisantes partout.', formule: '3745 + 4461,97 + 6438 + 2685,12 + 4852 = 22 182,09 €' }
+      },
+      {
+        q: 'Nouvelle provision mensuelle pour le lot 3 — Mme CAROL (base 9798 €, inflation +2 %, arrondi €supérieur).',
+        reponse: 833, tolerance: 1, unite: '€/mois',
+        aide: { texte: '9 798 × 1,02 / 12 = 832,83 → arrondi supérieur.', formule: '9 798 × 1,02 / 12 = 832,83 → 833 €/mois' }
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// ÉTAT EXERCICE
+// ═══════════════════════════════════════════════════════════
+let currentCas = null;
+let questionStates = [];
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  if (tab === 'exercice') {
+    // progress always visible
+    updateProgress();
+  } else {
+    // progress always visible
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCICE — INIT SELECT
+// ═══════════════════════════════════════════════════════════
+function initSelect() {
+  const sel = document.getElementById('cas-select');
+  const diffLabel = { facile: '🟢', moyen: '🟡', difficile: '🔴', extreme: '⚫' };
+  const groupes = { facile: null, moyen: null, difficile: null, extreme: null };
+  const groupNames = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile', extreme: '⚫ Extrême' };
+
+  CAS.forEach(c => {
+    if (!groupes[c.diff]) {
+      groupes[c.diff] = document.createElement('optgroup');
+      groupes[c.diff].label = groupNames[c.diff];
+    }
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `Cas ${String(c.id).padStart(2,'0')} — ${diffLabel[c.diff]} ${c.titre}`;
+    groupes[c.diff].appendChild(opt);
+  });
+
+  ['facile','moyen','difficile','extreme'].forEach(d => {
+    if (groupes[d]) sel.appendChild(groupes[d]);
+  });
+}
+
+function loadCas() {
+  const id = parseInt(document.getElementById('cas-select').value);
+  if (!id) return;
+  currentCas = CAS.find(c => c.id === id);
+  questionStates = currentCas.questions.map(() => 'pending');
+  renderCas();
+  updateProgress();
+}
+
+function resetCas() {
+  if (!currentCas) return;
+  questionStates = currentCas.questions.map(() => 'pending');
+  renderCas();
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCICE — RENDER
+// ═══════════════════════════════════════════════════════════
+function renderCas() {
+  const c = currentCas;
+  const diffClass = c.diff;
+  const diffLabel = { facile: '✔ Facile', moyen: '◆ Moyen', difficile: '▲ Difficile', extreme: '⬛ Extrême' }[c.diff];
+
+  let ctxHtml = c.contexte.map(item => `
+    <div class="ctx-item">
+      <div class="ctx-label">${item.label}</div>
+      <div class="ctx-value">${item.value}</div>
+    </div>`).join('');
+
+  // Note de cas (cas extrêmes)
+  const noteHtml = c.note ? `<div class="cas-note"><strong>📌 Consigne :</strong> ${c.note}</div>` : '';
+
+  // Tableau (cas extrêmes)
+  const tableauHtml = c.tableau ? c.tableau : '';
+
+  let questionsHtml = c.questions.map((q, i) => {
+    const state = questionStates[i];
+    const stateClass = state === 'done' ? 'state-done' : state === 'aide' ? 'state-aide' : '';
+    const statusIcon = state === 'done' ? '✓' : state === 'aide' ? '📌' : '';
+    const inputDisabled = state === 'done' || state === 'aide' ? 'disabled' : '';
+    const aideOpen = state === 'aide' ? 'open' : '';
+
+    return `
+    <div class="question-block ${stateClass}" id="qblock-${i}">
+      <div class="question-header">
+        <div class="q-num">${i+1}</div>
+        <div class="q-text">${q.q}</div>
+        ${statusIcon ? `<div class="q-status-icon">${statusIcon}</div>` : ''}
+      </div>
+      <div class="question-body">
+        <div class="answer-row">
+          <input type="number" step="any" class="answer-input" id="ans-${i}" placeholder="Votre réponse..." ${inputDisabled}>
+          <span class="answer-unit">${q.unite}</span>
+          <button class="btn-verifier" onclick="verifier(${i})" ${state !== 'pending' ? 'disabled' : ''}>Vérifier</button>
+          <button class="btn-aide" onclick="ouvrirAide(${i})" ${state === 'aide' ? 'disabled' : ''}>Résultat corrigé</button>
+        </div>
+        <div class="feedback-msg" id="fb-${i}"></div>
+        <div class="aide-box ${aideOpen}" id="aide-${i}">
+          <div class="aide-box-title">📌 Correction</div>
+          <p>${q.aide.texte}</p>
+          <div class="aide-formula">${q.aide.formule}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('cas-container').innerHTML = `
+    <div class="cas-card">
+      <div class="cas-card-header">
+        <div>
+          <div class="cas-number">CAS PRATIQUE N° ${String(c.id).padStart(2,'0')}</div>
+          <div class="cas-title">${c.titre}</div>
+        </div>
+        <span class="diff-badge ${diffClass}">${diffLabel}</span>
+      </div>
+      <div class="cas-body">
+        ${noteHtml}
+        <div class="contexte-grid">${ctxHtml}</div>
+        ${tableauHtml}
+        ${questionsHtml}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCICE — VÉRIFICATION
+// ═══════════════════════════════════════════════════════════
+function verifier(idx) {
+  if (questionStates[idx] !== 'pending') return;
+  const q = currentCas.questions[idx];
+  const val = parseFloat(document.getElementById(`ans-${idx}`).value);
+  const fb = document.getElementById(`fb-${idx}`);
+
+  if (isNaN(val)) {
+    fb.className = 'feedback-msg wrong';
+    fb.textContent = 'Veuillez saisir une valeur numérique.';
+    return;
+  }
+
+  const diff = Math.abs(val - q.reponse);
+  if (diff <= q.tolerance) {
+    questionStates[idx] = 'done';
+    fb.className = 'feedback-msg correct';
+    fb.textContent = `✓ Correct ! ${val.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2})} ${q.unite}`;
+    document.getElementById(`qblock-${idx}`).className = 'question-block state-done';
+    document.getElementById(`ans-${idx}`).disabled = true;
+    document.querySelector(`#qblock-${idx} .btn-verifier`).disabled = true;
+    const header = document.getElementById(`qblock-${idx}`).querySelector('.question-header');
+    let icon = header.querySelector('.q-status-icon');
+    if (!icon) { icon = document.createElement('div'); icon.className = 'q-status-icon'; header.appendChild(icon); }
+    icon.textContent = '✓';
+  } else {
+    fb.className = 'feedback-msg wrong';
+    fb.textContent = `✗ Incorrect. Vérifiez vos calculs.`;
+  }
+  updateProgress();
+}
+
+function ouvrirAide(idx) {
+  if (questionStates[idx] === 'done') return;
+  questionStates[idx] = 'aide';
+  document.getElementById(`aide-${idx}`).classList.add('open');
+  document.getElementById(`qblock-${idx}`).className = 'question-block state-aide';
+  document.getElementById(`ans-${idx}`).disabled = true;
+  document.querySelector(`#qblock-${idx} .btn-verifier`).disabled = true;
+  document.querySelector(`#qblock-${idx} .btn-aide`).disabled = true;
+  const header = document.getElementById(`qblock-${idx}`).querySelector('.question-header');
+  let icon = header.querySelector('.q-status-icon');
+  if (!icon) { icon = document.createElement('div'); icon.className = 'q-status-icon'; header.appendChild(icon); }
+  icon.textContent = '📌';
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════════════
+function updateProgress() {
+  if (!currentCas) {
+    document.getElementById('prog-fill').style.width = '0%';
+    document.getElementById('prog-score').textContent = '0 / 0';
+    document.getElementById('prog-bubbles').innerHTML = '';
+    return;
+  }
+  const total = questionStates.length;
+  const done = questionStates.filter(s => s === 'done').length;
+  const aide = questionStates.filter(s => s === 'aide').length;
+  const answered = done + aide;
+  const pct = total > 0 ? (answered / total * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-score').textContent = `${answered} / ${total}`;
+
+  const bubblesEl = document.getElementById('prog-bubbles');
+  bubblesEl.innerHTML = questionStates.map((s, i) => {
+    const cls = s === 'done' ? 'done' : s === 'aide' ? 'aide' : '';
+    return `<div class="bubble ${cls}" title="Q${i+1}">${i+1}</div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+initSelect();
+</script>
+<footer style="
+  margin-top: 48px;
+  border-top: 1px solid #e0ddd6;
+  padding: 20px 24px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #888;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.6;
+">
+  <span style="font-size: 1.1rem; flex-shrink:0; margin-top:1px;">⚠</span>
+  <div>
+    <strong style="color:#4a4a4a; font-weight:600;">Outil pédagogique</strong><br>
+    Résultats à titre indicatif uniquement. Chaque valeur doit être vérifiée indépendamment auprès des textes officiels ou d'un professionnel qualifié. L'auteur décline toute responsabilité pour un usage autre que l'apprentissage.
+  </div>
+</footer>
+</body></html>
