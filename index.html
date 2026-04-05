@@ -751,6 +751,7 @@ header::after {
 
 /* ── BADGE EXTREME ── */
 .diff-badge.extreme { background: #1E1B4B; color: #A5B4FC; }
+.diff-badge.expert { background: #1a1a1a; color: #F07800; border: 1px solid #F07800; }
 
 /* ── TABLEAUX CAS EXTRÊMES ── */
 .tableau-charges {
@@ -952,9 +953,9 @@ const CAS = [
         aide: { texte: 'Provisions = provision mensuelle × mois de présence.', formule: '50 × 12 = 600 €' }
       },
       {
-        q: 'Régularisation. Positif = trop-perçu (bailleur rembourse). Négatif = moins-perçu (locataire compléte).',
-        reponse: 36.26, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Régularisation = Charges récupérables réelles − Provisions versées.', formule: '636,26 − 600 = +36,26 € (trop-perçu bailleur)' }
+        q: 'Régularisation (du point de vue du bailleur). Positif = trop-perçu (bailleur rembourse). Négatif = moins-perçu (bailleur appelle le complément).',
+        reponse: -36.26, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Régularisation = Provisions versées − Charges réelles. Négatif → le bailleur a sous-perçu → il appelle 36,26 € au locataire.', formule: '600 − 636,26 = −36,26 € (moins-perçu → bailleur réclame 36,26 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (inflation +1,5 %, arrondie à l\'€ supérieur).',
@@ -979,9 +980,9 @@ const CAS = [
         aide: { texte: 'Total = copro récupérables + TEOM.', formule: '612 + 108 = 720 €' }
       },
       {
-        q: 'Régularisation (indiquer le signe).',
+        q: 'Régularisation (point de vue bailleur : Provisions − Charges).',
         reponse: -240, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 40 × 12 = 480 €. Résultat négatif = moins-perçu → le LOCATAIRE doit régler le complément.', formule: '720 − 480 = −240 € (moins-perçu)' }
+        aide: { texte: 'Provisions versées = 40 × 12 = 480 €. Résultat négatif → le bailleur a moins perçu que les charges réelles → il appelle 240 € au locataire.', formule: '480 − 720 = −240 € (moins-perçu → bailleur réclame 240 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1, sans revalorisation.',
@@ -1007,9 +1008,9 @@ const CAS = [
         aide: { texte: 'Copro récupérable = 853,73 × 73,57 % = 628,11 €. Le syndic détermine le % en appliquant le décret du 26 août 1987.', formule: '853,73 × 73,57 % + 127 = 755,11 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 35.11, tolerance: 0.6, unite: '€',
-        aide: { texte: 'Provisions versées = 60 × 12 = 720 €.', formule: '755,11 − 720 = +35,11 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -35.11, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 60 × 12 = 720 €. Résultat négatif → bailleur appelle 35,11 € au locataire.', formule: '720 − 755,11 = −35,11 € (moins-perçu → bailleur réclame 35,11 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (inflation +1,5 %, arrondi à l\'€ supérieur).',
@@ -1042,9 +1043,9 @@ const CAS = [
         aide: { texte: 'Le locataire arrivé le 1er février n\'est redevable que de sa période de présence effective.', formule: '1 408,75 × 11/12 = 1 291,35 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 81.35, tolerance: 0.6, unite: '€',
-        aide: { texte: 'Provisions versées = 110 × 11 = 1 210 €.', formule: '1 291,35 − 1 210 = +81,35 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -81.35, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 110 × 11 = 1 210 €. Résultat négatif → bailleur appelle 81,35 € au locataire.', formule: '1 210 − 1 291,35 = −81,35 € (moins-perçu → bailleur réclame 81,35 €)' }
       }
     ]
   },
@@ -1074,9 +1075,9 @@ const CAS = [
         aide: { texte: 'Provisions = provision mensuelle × mois de présence.', formule: '90 × 9 = 810 €' }
       },
       {
-        q: 'Régularisation (positif = trop-perçu bailleur).',
-        reponse: 135, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Régularisation = quote-part charges − provisions versées.', formule: '945 − 810 = +135 €' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -135, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 90 × 9 = 810 €. Résultat négatif → bailleur appelle 135 € au locataire.', formule: '810 − 945 = −135 € (moins-perçu → bailleur réclame 135 €)' }
       }
     ]
   },
@@ -1131,9 +1132,9 @@ const CAS = [
         aide: { texte: 'Total = copro récupérables + TEOM.', formule: '1 078 + 162 = 1 240 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 580, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 55 × 12 = 660 €.', formule: '1 240 − 660 = +580 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -580, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 55 × 12 = 660 €. Résultat négatif → bailleur appelle 580 € au locataire.', formule: '660 − 1 240 = −580 € (moins-perçu → bailleur réclame 580 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (inflation +2 %, arrondi à l\'€ supérieur).',
@@ -1163,9 +1164,9 @@ const CAS = [
         aide: { texte: 'Provisions = 45 × 6 = 270 €.', formule: '45 × 6 = 270 €' }
       },
       {
-        q: 'Régularisation (positif = trop-perçu).',
-        reponse: 282, tolerance: 0.5, unite: '€',
-        aide: { texte: 'La provision était très insuffisante (45 €) par rapport aux charges réelles. Régularisation = 552 − 270.', formule: '552 − 270 = +282 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -282, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 45 × 6 = 270 €. La provision était très insuffisante. Résultat négatif → bailleur appelle 282 € au locataire.', formule: '270 − 552 = −282 € (moins-perçu → bailleur réclame 282 €)' }
       }
     ]
   },
@@ -1185,9 +1186,9 @@ const CAS = [
         aide: { texte: 'Total N = copro récupérables + TEOM.', formule: '924 + 138 = 1 062 €' }
       },
       {
-        q: 'Régularisation pour l\'année N.',
-        reponse: 402, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 55 × 12 = 660 €. La provision de 55 € était manifestement sous-évaluée.', formule: '1 062 − 660 = +402 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -402, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 55 × 12 = 660 €. La provision était manifestement sous-évaluée. Résultat négatif → bailleur appelle 402 €.', formule: '660 − 1 062 = −402 € (moins-perçu → bailleur réclame 402 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (sans inflation, arrondi à l\'€ supérieur).',
@@ -1247,9 +1248,9 @@ const CAS = [
         aide: { texte: 'Charges récupérables du lot = quote-part lot × % récupérable + TEOM = 1 500 × 70 % + 140.', formule: '1 500 × 70 % + 140 = 1 190 €' }
       },
       {
-        q: 'Régularisation pour le locataire.',
-        reponse: -10, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €. 1 190 − 1 200 = −10 € → bailleur rembourse 10 € au locataire.', formule: '1 190 − 1 200 = −10 € (bailleur rembourse)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: 10, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €. Résultat positif → le bailleur a trop perçu → il rembourse 10 € au locataire.', formule: '1 200 − 1 190 = +10 € (trop-perçu → bailleur rembourse 10 €)' }
       }
     ]
   },
@@ -1278,9 +1279,9 @@ const CAS = [
         aide: { texte: 'Total = ascenseur + gardiennage (75%) + espaces verts + TEOM.', formule: '350 + 600 + 180 + 205 = 1 335 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 135, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €.', formule: '1 335 − 1 200 = +135 €' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -135, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 100 × 12 = 1 200 €. Résultat négatif → bailleur appelle 135 €.', formule: '1 200 − 1 335 = −135 € (moins-perçu → bailleur réclame 135 €)' }
       }
     ]
   },
@@ -1301,9 +1302,9 @@ const CAS = [
         aide: { texte: 'Total N = copro récupérables + TEOM.', formule: '1 104 + 156 = 1 260 €' }
       },
       {
-        q: 'Régularisation pour l\'année N.',
-        reponse: 240, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées N = 85 × 12 = 1 020 €.', formule: '1 260 − 1 020 = +240 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -240, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées N = 85 × 12 = 1 020 €. Résultat négatif → bailleur appelle 240 €.', formule: '1 020 − 1 260 = −240 € (moins-perçu → bailleur réclame 240 €)' }
       },
       {
         q: 'Si le bailleur n\'a pas régularisé N-1 dans l\'année civile suivante, par combien d\'échéances le locataire peut-il exiger le règlement ?',
@@ -1340,9 +1341,9 @@ const CAS = [
         aide: { texte: 'Total = eau + copro hors eau récupérables + TEOM.', formule: '454,40 + 580 + 110 = 1 144,40 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 4.40, tolerance: 0.6, unite: '€',
-        aide: { texte: 'Provisions versées = 95 × 12 = 1 140 €. Quasi-équilibre.', formule: '1 144,40 − 1 140 = +4,40 €' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -4.40, tolerance: 0.6, unite: '€',
+        aide: { texte: 'Provisions versées = 95 × 12 = 1 140 €. Quasi-équilibre, très faible appel.', formule: '1 140 − 1 144,40 = −4,40 € (moins-perçu → bailleur réclame 4,40 €)' }
       }
     ]
   },
@@ -1364,9 +1365,9 @@ const CAS = [
         aide: { texte: 'Total = copro récupérables + TEOM.', formule: '1 020 + 180 = 1 200 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 180, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 85 × 12 = 1 020 €.', formule: '1 200 − 1 020 = +180 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -180, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 85 × 12 = 1 020 €. Résultat négatif → bailleur appelle 180 €.', formule: '1 020 − 1 200 = −180 € (moins-perçu → bailleur réclame 180 €)' }
       },
       {
         q: 'Recettes brutes annuelles à déclarer au régime réel (loyers HC + provisions perçues).',
@@ -1401,9 +1402,9 @@ const CAS = [
         aide: { texte: 'Quote-part A = 1 920 × 4/12.', formule: '1 920 × 4/12 = 640 €' }
       },
       {
-        q: 'Régularisation pour le locataire A.',
-        reponse: 360, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions A = 70 × 4 = 280 €.', formule: '640 − 280 = +360 € (trop-perçu)' }
+        q: 'Régularisation locataire A (Provisions − Charges).',
+        reponse: -360, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions A = 70 × 4 = 280 €. Quote-part charges A = 1 920 × 4/12 = 640 €.', formule: '280 − 640 = −360 € (moins-perçu → bailleur réclame 360 € à A)' }
       },
       {
         q: 'Quote-part du locataire B (8 mois / 12).',
@@ -1411,9 +1412,9 @@ const CAS = [
         aide: { texte: 'Quote-part B = 1 920 × 8/12.', formule: '1 920 × 8/12 = 1 280 €' }
       },
       {
-        q: 'Régularisation pour le locataire B.',
-        reponse: 720, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions B = 70 × 8 = 560 €.', formule: '1 280 − 560 = +720 € (trop-perçu)' }
+        q: 'Régularisation locataire B (Provisions − Charges).',
+        reponse: -720, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions B = 70 × 8 = 560 €. Quote-part charges B = 1 920 × 8/12 = 1 280 €.', formule: '560 − 1 280 = −720 € (moins-perçu → bailleur réclame 720 € à B)' }
       }
     ]
   },
@@ -1439,9 +1440,9 @@ const CAS = [
         aide: { texte: 'Quote-part A = 1 680 × 2/12.', formule: '1 680 × 2/12 = 280 €' }
       },
       {
-        q: 'Régularisation pour le locataire A.',
-        reponse: 160, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions A = 60 × 2 = 120 €.', formule: '280 − 120 = +160 € (trop-perçu)' }
+        q: 'Régularisation locataire A (Provisions − Charges).',
+        reponse: -160, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions A = 60 × 2 = 120 €. Quote-part A = 1 680 × 2/12 = 280 €.', formule: '120 − 280 = −160 € (moins-perçu → bailleur réclame 160 € à A)' }
       },
       {
         q: 'Charges pendant la vacance (2 mois) — montant à la charge exclusive du bailleur.',
@@ -1449,9 +1450,9 @@ const CAS = [
         aide: { texte: 'Pendant la vacance locative, il n\'y a pas de locataire. Les charges sont INTÉGRALEMENT à la charge du bailleur. Elles ne peuvent être imputées ni à A ni à B.', formule: '1 680 × 2/12 = 280 € → charge exclusive du bailleur' }
       },
       {
-        q: 'Régularisation pour le locataire B (8 mois / 12).',
-        reponse: 640, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Quote-part B = 1 680 × 8/12 = 1 120 €. Provisions B = 60 × 8 = 480 €.', formule: '1 120 − 480 = +640 € (trop-perçu)' }
+        q: 'Régularisation locataire B (Provisions − Charges).',
+        reponse: -640, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions B = 60 × 8 = 480 €. Quote-part B = 1 680 × 8/12 = 1 120 €.', formule: '480 − 1 120 = −640 € (moins-perçu → bailleur réclame 640 € à B)' }
       }
     ]
   },
@@ -1478,9 +1479,9 @@ const CAS = [
         aide: { texte: 'Le ravalement de façade = travaux de gros entretien → NON récupérable sur le locataire (décret 1987). Total = 1 440 + 360 + 190.', formule: '1 440 + 360 + 190 = 1 990 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 550, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 120 × 12 = 1 440 €.', formule: '1 990 − 1 440 = +550 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -550, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 120 × 12 = 1 440 €. Résultat négatif → bailleur appelle 550 €.', formule: '1 440 − 1 990 = −550 € (moins-perçu → bailleur réclame 550 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (inflation +2 %, arrondi à l\'€ supérieur).',
@@ -1502,9 +1503,9 @@ const CAS = [
     ],
     questions: [
       {
-        q: 'Régularisation pour l\'année N.',
-        reponse: 360, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Charges réelles = 1 450 + 230 = 1 680 €. Provisions = 110 × 12 = 1 320 €.', formule: '1 680 − 1 320 = +360 €' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -360, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 110 × 12 = 1 320 €. Charges réelles = 1 680 €. Résultat négatif → bailleur appelle 360 €.', formule: '1 320 − 1 680 = −360 € (moins-perçu → bailleur réclame 360 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 (inflation +3 %, arrondi à l\'€ supérieur).',
@@ -1551,9 +1552,9 @@ const CAS = [
         aide: { texte: '1 632 × 10/12.', formule: '1 632 × 10/12 = 1 360 €' }
       },
       {
-        q: 'Régularisation.',
-        reponse: 410, tolerance: 0.5, unite: '€',
-        aide: { texte: 'Provisions versées = 95 × 10 = 950 €.', formule: '1 360 − 950 = +410 €' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -410, tolerance: 0.5, unite: '€',
+        aide: { texte: 'Provisions versées = 95 × 10 = 950 €. Quote-part = 1 360 €. Résultat négatif → bailleur appelle 410 €.', formule: '950 − 1 360 = −410 € (moins-perçu → bailleur réclame 410 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 — base charges annuelles 12 mois + inflation +1,5 %, arrondie à l\'€ supérieur.',
@@ -1618,9 +1619,9 @@ const CAS = [
         aide: { texte: 'Mars partiel = 130 × 17/31 = 71,29 €. Mois complets avr à déc = 9 × 130 = 1 170 €.', formule: '(130 × 17/31) + (9 × 130) = 71,29 + 1 170 = 1 241,29 €' }
       },
       {
-        q: 'Régularisation pour M. BERNARD (positif = trop-perçu bailleur).',
-        reponse: 2115.32, tolerance: 3, unite: '€',
-        aide: { texte: 'Régularisation = charges imputables − provisions versées.', formule: '3 356,61 − 1 241,29 = +2 115,32 € (trop-perçu)' }
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -2115.32, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions versées = 1 241,29 €. Charges imputables = 3 356,61 €. Résultat négatif → bailleur appelle 2 115,32 €.', formule: '1 241,29 − 3 356,61 = −2 115,32 € (moins-perçu → bailleur réclame 2 115,32 €)' }
       },
       {
         q: 'Nouvelle provision mensuelle N+1 — base charges annuelles 12 mois du lot, inflation +2 %, arrondi €supérieur.',
@@ -1681,8 +1682,8 @@ const CAS = [
       },
       {
         q: 'LOT A — Régularisation Mme DUPONT (12 mois × 80 €).',
-        reponse: 1085.40, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 80 × 12 = 960 €.', formule: '2 045,40 − 960 = +1 085,40 € (trop-perçu)' }
+        reponse: -1085.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 80 × 12 = 960 €. Charges lot A = 2 045,40 €. Résultat négatif → bailleur appelle.', formule: '960 − 2 045,40 = −1 085,40 € (moins-perçu → bailleur réclame 1 085,40 €)' }
       },
       {
         q: 'LOT B — Charges récupérables M. MARTIN : tantièmes généraux (390/1000) pour les postes eau + élec + gardien + nettoyage + interphone.',
@@ -1705,9 +1706,9 @@ const CAS = [
         aide: { texte: 'M. MARTIN : 1er avr → 31 déc = avr(30)+mai(31)+juin(30)+juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 275 jours.', formule: '4 139,80 × 275/366 = 3 110,81 €' }
       },
       {
-        q: 'LOT B — Régularisation M. MARTIN (9 mois × 150 €).',
-        reponse: 1760.81, tolerance: 3, unite: '€',
-        aide: { texte: 'Provisions = 150 × 9 = 1 350 €.', formule: '3 110,81 − 1 350 = +1 760,81 € (trop-perçu)' }
+        q: 'LOT B — Régularisation M. MARTIN (Provisions − Charges).',
+        reponse: -1760.81, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 150 × 9 = 1 350 €. Charges imputables = 3 110,81 €.', formule: '1 350 − 3 110,81 = −1 760,81 € (moins-perçu → bailleur réclame 1 760,81 €)' }
       },
       {
         q: 'LOT C — Total charges récupérables M. et Mme LEROY (tantièmes généraux + ascenseur + espaces verts exclusifs + TEOM C).',
@@ -1716,8 +1717,8 @@ const CAS = [
       },
       {
         q: 'LOT C — Régularisation M. et Mme LEROY (12 mois × 180 €).',
-        reponse: 3199.80, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 180 × 12 = 2 160 €.', formule: '5 359,80 − 2 160 = +3 199,80 € (trop-perçu)' }
+        reponse: -3199.80, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 180 × 12 = 2 160 €. Charges lot C = 5 359,80 €.', formule: '2 160 − 5 359,80 = −3 199,80 € (moins-perçu → bailleur réclame 3 199,80 €)' }
       }
     ]
   },
@@ -1774,9 +1775,9 @@ const CAS = [
         aide: { texte: 'Collectif = 4860 × 210/1000 = 1020,60 €. Eau = 338,10 €. TEOM = 168 €.', formule: '1 020,60 + 338,10 + 168 = 1 526,70 €' }
       },
       {
-        q: 'LOT 1 — Régularisation Mme GARCIA (12 mois × 95 €).',
-        reponse: 386.70, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 95 × 12 = 1 140 €.', formule: '1 526,70 − 1 140 = +386,70 €' }
+        q: 'LOT 1 — Régularisation Mme GARCIA (Provisions − Charges).',
+        reponse: -386.70, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 95 × 12 = 1 140 €. Charges = 1 526,70 €.', formule: '1 140 − 1 526,70 = −386,70 € (moins-perçu → bailleur réclame 386,70 €)' }
       },
       {
         q: 'LOT 2 — M. PETIT : charges collectives + eau compteur + TEOM. Total.',
@@ -1784,9 +1785,9 @@ const CAS = [
         aide: { texte: 'Collectif = 1020,60 €. Eau = 427,80 €. TEOM = 168 €.', formule: '1 020,60 + 427,80 + 168 = 1 616,40 €' }
       },
       {
-        q: 'LOT 2 — Régularisation M. PETIT.',
-        reponse: 476.40, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 95 × 12 = 1 140 €.', formule: '1 616,40 − 1 140 = +476,40 €' }
+        q: 'LOT 2 — Régularisation M. PETIT (Provisions − Charges).',
+        reponse: -476.40, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 95 × 12 = 1 140 €. Charges = 1 616,40 €.', formule: '1 140 − 1 616,40 = −476,40 € (moins-perçu → bailleur réclame 476,40 €)' }
       },
       {
         q: 'LOT 3 — Charges collectives annuelles lot (4860 × 290/1000).',
@@ -1809,9 +1810,9 @@ const CAS = [
         aide: { texte: 'Eau = relevé réel = 300,15 € (non proratisée, c\'est la consommation mesurée). Collectif proratisé = 707,96 €. TEOM = 97,98 €.', formule: '707,96 + 300,15 + 97,98 = 1 106,09 €' }
       },
       {
-        q: 'LOT 3 — Régularisation Mme THOMAS (6 mois × 120 €).',
-        reponse: 386.09, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 120 × 6 = 720 €.', formule: '1 106,09 − 720 = +386,09 €' }
+        q: 'LOT 3 — Régularisation Mme THOMAS (Provisions − Charges).',
+        reponse: -386.09, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 120 × 6 = 720 €. Charges imputables = 1 106,09 €.', formule: '720 − 1 106,09 = −386,09 € (moins-perçu → bailleur réclame 386,09 €)' }
       },
       {
         q: 'LOT 4 — M. ROUX : total charges récupérables (12 mois, 290 tantièmes + eau + TEOM).',
@@ -1819,9 +1820,9 @@ const CAS = [
         aide: { texte: 'Collectif = 1409,40 €. Eau = 538,20 €. TEOM = 195 €.', formule: '1 409,40 + 538,20 + 195 = 2 142,60 €' }
       },
       {
-        q: 'LOT 4 — Régularisation M. ROUX (12 mois × 135 €).',
-        reponse: 522.60, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 135 × 12 = 1 620 €.', formule: '2 142,60 − 1 620 = +522,60 €' }
+        q: 'LOT 4 — Régularisation M. ROUX (Provisions − Charges).',
+        reponse: -522.60, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 135 × 12 = 1 620 €. Charges = 2 142,60 €.', formule: '1 620 − 2 142,60 = −522,60 € (moins-perçu → bailleur réclame 522,60 €)' }
       }
     ]
   },
@@ -1866,28 +1867,28 @@ const CAS = [
       },
       {
         q: 'LOT 3 — Charges aux tantièmes généraux (200/1000) : eau froide + électricité + gardien 75% + nettoyage + espaces verts + ascenseur.',
-        reponse: 5240, tolerance: 2, unite: '€',
-        aide: { texte: 'Récupérable général total = 2160+1440+16200+2400+3600+2400 = 28 200 €. Hmm : gardien 21600×75%=16200. Total = 2160+1440+16200+2400+3600+2400 = 28 200. Quote-part lot 3 = 28200 × 200/1000 = 5640 €. Attention : vérifier. Eau(2160)+élec(1440)+gardien(16200)+nettoyage(2400)+esp.verts(3600)+asc(2400) = 26 200. Quote-part = 26200×200/1000 = 5240.', formule: '26 200 × 200/1000 = 5 240 €' }
+        reponse: 5640, tolerance: 2, unite: '€',
+        aide: { texte: 'Récupérable général = eau(2160)+élec(1440)+gardien 75%(16200)+nettoyage(2400)+espaces verts(3600)+ascenseur(2400) = 28 200 €. Quote-part lot 3 = 28 200 × 200/1000.', formule: '28 200 × 200/1000 = 5 640 €' }
       },
       {
         q: 'LOT 3 — Total charges récupérables annuelles (thermique + général + TEOM).',
-        reponse: 10106, tolerance: 2, unite: '€',
-        aide: { texte: 'Total = chauffage(3720) + eau chaude(960) + général(5240) + TEOM(186).', formule: '3 720 + 960 + 5 240 + 186 = 10 106 €' }
+        reponse: 10506, tolerance: 2, unite: '€',
+        aide: { texte: 'Total = chauffage(3720) + eau chaude(960) + général(5640) + TEOM(186).', formule: '3 720 + 960 + 5 640 + 186 = 10 506 €' }
       },
       {
         q: 'LOT 3 — Charges imputables à M. FONTAINE (275 jours / 366). Les 91 jours de vacance sont à charge du bailleur.',
-        reponse: 7593.17, tolerance: 5, unite: '€',
-        aide: { texte: '1er avr → 31 déc = avr(30)+mai(31)+juin(30)+juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 275 jours.', formule: '10 106 × 275/366 = 7 593,17 €' }
+        reponse: 7893.85, tolerance: 5, unite: '€',
+        aide: { texte: '1er avr → 31 déc = avr(30)+mai(31)+juin(30)+juil(31)+août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 275 jours.', formule: '10 506 × 275/366 = 7 893,85 €' }
       },
       {
         q: 'LOT 3 — Charges pendant la vacance (91 jours jan-mars) — à la charge exclusive du bailleur.',
-        reponse: 2512.83, tolerance: 5, unite: '€',
-        aide: { texte: 'jan(31)+fév(29)+mars(31) = 91 jours. Ces charges ne peuvent être réclamées à aucun locataire.', formule: '10 106 × 91/366 = 2 512,83 € → bailleur' }
+        reponse: 2612.15, tolerance: 5, unite: '€',
+        aide: { texte: 'jan(31)+fév(29)+mars(31) = 91 jours. Ces charges ne peuvent être réclamées à aucun locataire.', formule: '10 506 × 91/366 = 2 612,15 € → bailleur' }
       },
       {
-        q: 'LOT 3 — Régularisation M. FONTAINE (9 mois × 290 €).',
-        reponse: 4983.17, tolerance: 5, unite: '€',
-        aide: { texte: 'Provisions = 290 × 9 = 2 610 €.', formule: '7 593,17 − 2 610 = +4 983,17 € (trop-perçu massif)' }
+        q: 'LOT 3 — Régularisation M. FONTAINE (Provisions − Charges).',
+        reponse: -5283.85, tolerance: 5, unite: '€',
+        aide: { texte: 'Provisions = 290 × 9 = 2 610 €. Charges imputables = 7 893,85 €. Sous-provision très importante.', formule: '2 610 − 7 893,85 = −5 283,85 € (moins-perçu → bailleur réclame 5 283,85 €)' }
       }
     ]
   },
@@ -1921,8 +1922,8 @@ const CAS = [
       },
       {
         q: 'LOT 1 — Régularisation Mme ALBERT.',
-        reponse: 3745, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 180 × 12 = 2 160 €.', formule: '5 905 − 2 160 = +3 745 €' }
+        reponse: -3745, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 180 × 12 = 2 160 €. Charges = 5 905 €.', formule: '2 160 − 5 905 = −3 745 € (moins-perçu → bailleur réclame 3 745 €)' }
       },
       {
         q: 'LOT 2 — M. BESSON : quote-part annuelle (38400 × 200/1000) + TEOM 172 €. Total annuel brut.',
@@ -1935,9 +1936,9 @@ const CAS = [
         aide: { texte: '1er mars → 31 déc : mars(31)+avr(30)+...+déc(31) = 306 jours.', formule: '7 852 × 306/366 = 6 561,97 €' }
       },
       {
-        q: 'LOT 2 — Régularisation M. BESSON (10 mois × 210 €).',
-        reponse: 4461.97, tolerance: 3, unite: '€',
-        aide: { texte: 'Provisions = 210 × 10 = 2 100 €.', formule: '6 561,97 − 2 100 = +4 461,97 €' }
+        q: 'LOT 2 — Régularisation M. BESSON (Provisions − Charges).',
+        reponse: -4461.97, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 210 × 10 = 2 100 €. Charges imputables = 6 561,97 €.', formule: '2 100 − 6 561,97 = −4 461,97 € (moins-perçu → bailleur réclame 4 461,97 €)' }
       },
       {
         q: 'LOT 3 — Mme CAROL : total charges récupérables (38400 × 250/1000 + TEOM 198 €).',
@@ -1945,9 +1946,9 @@ const CAS = [
         aide: { texte: '38400 × 250/1000 = 9600 €. + TEOM 198 €.', formule: '9 600 + 198 = 9 798 €' }
       },
       {
-        q: 'LOT 3 — Régularisation Mme CAROL.',
-        reponse: 6438, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 280 × 12 = 3 360 €.', formule: '9 798 − 3 360 = +6 438 €' }
+        q: 'LOT 3 — Régularisation Mme CAROL (Provisions − Charges).',
+        reponse: -6438, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 280 × 12 = 3 360 €. Charges = 9 798 €.', formule: '3 360 − 9 798 = −6 438 € (moins-perçu → bailleur réclame 6 438 €)' }
       },
       {
         q: 'LOT 4 — M. DUMAS : charges imputables (38400 × 200/1000 + TEOM 172 €) proratisées 184 jours / 366.',
@@ -1955,9 +1956,9 @@ const CAS = [
         aide: { texte: 'Total annuel = 7680 + 172 = 7852 €. Proratisé = 7852 × 184/366.', formule: '7 852 × 184/366 = 3 945,12 €' }
       },
       {
-        q: 'LOT 4 — Régularisation M. DUMAS (6 mois × 210 €).',
-        reponse: 2685.12, tolerance: 3, unite: '€',
-        aide: { texte: 'Provisions = 210 × 6 = 1 260 €.', formule: '3 945,12 − 1 260 = +2 685,12 €' }
+        q: 'LOT 4 — Régularisation M. DUMAS (Provisions − Charges).',
+        reponse: -2685.12, tolerance: 3, unite: '€',
+        aide: { texte: 'Provisions = 210 × 6 = 1 260 €. Charges imputables = 3 945,12 €.', formule: '1 260 − 3 945,12 = −2 685,12 € (moins-perçu → bailleur réclame 2 685,12 €)' }
       },
       {
         q: 'LOT 5 — Mme ERNST : total charges récupérables (38400 × 200/1000 + TEOM 172 €).',
@@ -1965,14 +1966,14 @@ const CAS = [
         aide: { texte: '38400 × 200/1000 = 7680 €. + TEOM 172 €.', formule: '7 680 + 172 = 7 852 €' }
       },
       {
-        q: 'LOT 5 — Régularisation Mme ERNST.',
-        reponse: 4852, tolerance: 2, unite: '€',
-        aide: { texte: 'Provisions = 250 × 12 = 3 000 €.', formule: '7 852 − 3 000 = +4 852 €' }
+        q: 'LOT 5 — Régularisation Mme ERNST (Provisions − Charges).',
+        reponse: -4852, tolerance: 2, unite: '€',
+        aide: { texte: 'Provisions = 250 × 12 = 3 000 €. Charges = 7 852 €.', formule: '3 000 − 7 852 = −4 852 € (moins-perçu → bailleur réclame 4 852 €)' }
       },
       {
-        q: 'SYNTHÈSE BAILLEUR — Total des trop-perçus à rembourser aux 5 locataires.',
+        q: 'SYNTHÈSE BAILLEUR — Total des moins-perçus à appeler auprès des 5 locataires.',
         reponse: 22182.09, tolerance: 15, unite: '€',
-        aide: { texte: 'Tous les locataires ont un trop-perçu : provisions insuffisantes partout.', formule: '3745 + 4461,97 + 6438 + 2685,12 + 4852 = 22 182,09 €' }
+        aide: { texte: 'Les provisions étaient insuffisantes dans tous les lots. Saisir la valeur absolue du total des rappels à appeler.', formule: '3 745 + 4 461,97 + 6 438 + 2 685,12 + 4 852 = 22 182,09 €' }
       },
       {
         q: 'Nouvelle provision mensuelle pour le lot 3 — Mme CAROL (base 9798 €, inflation +2 %, arrondi €supérieur).',
@@ -1981,6 +1982,341 @@ const CAS = [
       }
     ]
   }
+  // ─── EXPERT (26-30) ──────────────────────────────────────
+  ,{
+    id: 26, diff: 'expert',
+    titre: 'Immeuble Montaigne — 4 clés de répartition distinctes',
+    note: 'Aucune aide disponible sur ce niveau. Les informations nécessaires sont dans le tableau. À vous d\'identifier les bonnes clés, les bons postes et les bons taux.',
+    contexte: [
+      { label: 'Lot 1', value: '250 tant. gén. / 200 tant. therm. — Espaces verts ✓ — Pas d\'ascenseur' },
+      { label: 'Lot 2', value: '300 tant. gén. / 300 tant. therm. — Ascenseur ✓ — Espaces verts ✓' },
+      { label: 'Lot 3', value: '250 tant. gén. / 300 tant. therm. — Ascenseur ✓ — Pas d\'espaces verts' },
+      { label: 'Lot 4', value: '200 tant. gén. / 200 tant. therm. — Ascenseur ✓ — Pas d\'espaces verts' },
+      { label: 'Clé ascenseur', value: 'Lots 2+3+4 uniquement (300+250+200 = 750 tantièmes)' },
+      { label: 'Clé espaces verts', value: 'Lots 1+2 uniquement (250+300 = 550 tantièmes)' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges annuelles immeuble 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Total</th><th>% Récup.</th><th>Clé</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide collective</td><td>3 600 €</td><td class="td-pct">100 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Eau chaude collective</td><td>5 400 €</td><td class="td-pct">100 %</td><td>Tantièmes thermiques</td></tr>
+<tr><td class="td-poste">Électricité parties communes</td><td>1 800 €</td><td class="td-pct">100 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Gardien (entretien + surveillance)</td><td>24 000 €</td><td class="td-pct">75 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Ascenseur</td><td>2 400 €</td><td class="td-pct">100 %</td><td>Clé ascenseur (lots 2+3+4)</td></tr>
+<tr><td class="td-poste">Nettoyage parties communes</td><td>1 440 €</td><td class="td-pct">100 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Entretien espaces verts</td><td>2 160 €</td><td class="td-pct">100 %</td><td>Clé jardins (lots 1+2)</td></tr>
+<tr><td class="td-poste">Assurance immeuble</td><td>3 600 €</td><td class="td-pct nr">0 %</td><td>—</td></tr>
+<tr><td class="td-poste">Ravalement façade</td><td>30 000 €</td><td class="td-pct nr">0 %</td><td>—</td></tr>
+</tbody></table></div>
+<div class="locataire-card" style="margin-top:16px;">
+  <div class="locataire-title"><span class="lot-badge">LOT 3</span>Mme NGUYEN — 250 tant. gén. / 300 tant. therm. — 12 mois — Prov. 140 €/mois — TEOM 195 €</div>
+</div>`,
+    questions: [
+      {
+        q: 'Calculez les charges récupérables de Mme NGUYEN pour les postes aux tantièmes généraux.',
+        reponse: 5610, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez les charges récupérables de Mme NGUYEN pour les postes aux tantièmes thermiques.',
+        reponse: 1620, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez la quote-part ascenseur de Mme NGUYEN.',
+        reponse: 800, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez le total des charges récupérables de Mme NGUYEN (tous postes + TEOM).',
+        reponse: 8225, tolerance: 3, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -6545, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Nouvelle provision mensuelle N+1 (inflation +2 %, arrondi €supérieur).',
+        reponse: 700, tolerance: 2, unite: '€/mois',
+        aide: null
+      }
+    ]
+  },
+  {
+    id: 27, diff: 'expert',
+    titre: 'Immeuble Pasteur — Eau chaude compteur + départ en cours d\'année',
+    note: 'Aucune aide. Identifier ce qui se proratise et ce qui ne se proratise pas. La TEOM suit la présence. L\'eau chaude individualisée est facturée au relevé réel.',
+    contexte: [
+      { label: 'Lot 1', value: '300 tantièmes' },
+      { label: 'Lot 2', value: '350 tantièmes' },
+      { label: 'Lot 3', value: '350 tantièmes' },
+      { label: 'Lot 2 — locataire', value: 'M. KACI — départ 31 juillet (7 mois) — Prov. 95 €/mois — TEOM 178 €' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges collectives 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Total</th><th>% Récup.</th><th>Clé</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide parties communes</td><td>1 200 €</td><td class="td-pct">100 %</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Électricité + VMC</td><td>2 160 €</td><td class="td-pct">100 %</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Gardien (entretien seul)</td><td>9 600 €</td><td class="td-pct">40 %</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Nettoyage + produits</td><td>1 920 €</td><td class="td-pct">100 %</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Interphone</td><td>480 €</td><td class="td-pct">100 %</td><td>Tantièmes</td></tr>
+<tr><td class="td-poste">Assurance immeuble</td><td>2 400 €</td><td class="td-pct nr">0 %</td><td>—</td></tr>
+</tbody></table></div>
+<div class="section-titre" style="margin-top:12px;">💧 Eau chaude individuelle — Compteur lot 2</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr><th>Relevé</th><th>Consommation</th><th>Prix/m³</th></tr></thead>
+<tbody>
+<tr><td class="td-poste">M. KACI — Lot 2</td><td>68 m³</td><td>3,80 €/m³</td></tr>
+</tbody></table></div>`,
+    questions: [
+      {
+        q: 'Calculez le total des charges collectives récupérables de l\'immeuble.',
+        reponse: 10560, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez la quote-part annuelle des charges collectives pour le lot 2.',
+        reponse: 3696, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez les charges collectives imputables à M. KACI (7 mois de présence).',
+        reponse: 2156, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez le montant de la consommation d\'eau chaude de M. KACI.',
+        reponse: 258.40, tolerance: 0.5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez la TEOM imputable à M. KACI.',
+        reponse: 103.83, tolerance: 1, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez le total des charges imputables à M. KACI.',
+        reponse: 2518.23, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Régularisation pour M. KACI (Provisions − Charges).',
+        reponse: -1853.23, tolerance: 3, unite: '€',
+        aide: null
+      }
+    ]
+  },
+  {
+    id: 28, diff: 'expert',
+    titre: 'Maison individuelle — Sans copropriété',
+    note: 'Aucune aide. Pas de charges de copropriété ici. Identifier parmi les éléments ceux qui sont récupérables selon le décret du 26 août 1987, ceux qui doivent être proratisés, et ceux qui ne le sont pas.',
+    contexte: [
+      { label: 'Type de bien', value: 'Maison individuelle (pas de copropriété)' },
+      { label: 'Locataire', value: 'M. et Mme PERRIN — entrée 1er mars, sortie 30 sept. (7 mois)' },
+      { label: 'Provision mensuelle', value: '80 €/mois' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges et dépenses du bailleur — 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Montant annuel</th><th>Nature</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Eau froide individuelle (compteur)</td><td>210 m³ × 2,95 €/m³</td><td>Relevé réel période</td></tr>
+<tr><td class="td-poste">Taxe foncière totale</td><td>1 200 €</td><td>dont TEOM : 312 €</td></tr>
+<tr><td class="td-poste">Entretien jardin (pelouse + haies)</td><td>480 €/an</td><td>Contrat annuel</td></tr>
+<tr><td class="td-poste">Ramonage cheminée</td><td>120 €</td><td>Intervention unique (octobre)</td></tr>
+<tr><td class="td-poste">Assurance PNO propriétaire</td><td>340 €/an</td><td>Assurance bailleur</td></tr>
+<tr><td class="td-poste">Taxe foncière hors TEOM</td><td>888 €</td><td>À la charge du bailleur</td></tr>
+</tbody></table></div>
+<div class="cas-note"><strong>Rappel décret 1987 :</strong> En maison individuelle, les seules charges récupérables sont celles correspondant à des services rendus au locataire ou à l'entretien des éléments qu'il utilise : eau, TEOM, entretien jardin (si usage privatif locataire), ramonage. L'assurance PNO et la taxe foncière (hors TEOM) restent à la charge du bailleur.</div>`,
+    questions: [
+      {
+        q: 'Calculez le montant de la consommation d\'eau (relevé réel — non proratisé).',
+        reponse: 619.50, tolerance: 0.5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez la TEOM imputable au locataire (proratisée selon la présence).',
+        reponse: 182, tolerance: 1, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Calculez l\'entretien jardin imputable au locataire (proratisé).',
+        reponse: 280, tolerance: 1, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Le ramonage d\'octobre est-il imputable au locataire parti en septembre ? (1 = OUI / 0 = NON)',
+        reponse: 0, tolerance: 0, unite: '(1=oui / 0=non)',
+        aide: null
+      },
+      {
+        q: 'Calculez le total des charges récupérables imputables aux locataires.',
+        reponse: 1081.50, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'Régularisation (Provisions − Charges).',
+        reponse: -521.50, tolerance: 3, unite: '€',
+        aide: null
+      }
+    ]
+  },
+  {
+    id: 29, diff: 'expert',
+    titre: 'Immeuble Laval — 6 lots, 2 clés thermiques, vacance et changements',
+    note: 'Aucune aide. Immeuble avec deux systèmes de tantièmes. Vacance lot 4. Les 3 lots ci-dessous sont à traiter indépendamment.',
+    contexte: [
+      { label: 'Tantièmes généraux', value: 'L1=150 / L2=200 / L3=200 / L4=200 / L5=150 / L6=100 — Total 1000' },
+      { label: 'Tantièmes thermiques', value: 'L1=150 / L2=200 / L3=200 / L4=250 / L5=100 / L6=100 — Total 1000' },
+      { label: 'Clé ascenseur', value: 'Lots 2+3+4+5+6 (200+200+200+150+100 = 850 tant.)' },
+      { label: 'Clé espaces verts', value: 'Lots 1+2+3 (150+200+200 = 550 tant.)' },
+      { label: 'Lot 1', value: '12 mois — Prov. 200 €/m — TEOM 148 € — Espaces verts ✓ — Pas d\'ascenseur' },
+      { label: 'Lot 4', value: 'Vacant janv+fév — Locataire 1er mars (10 mois) — Prov. 210 €/m — TEOM 162 €' },
+      { label: 'Lot 6', value: 'Départ 30 juin (6 mois) — Prov. 130 €/m — TEOM 122 €' },
+    ],
+    tableau: `<div class="section-titre">📋 Charges annuelles immeuble 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th class="th-poste">Poste</th><th>Total</th><th>% Récup.</th><th>Clé</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Chauffage collectif fioul</td><td>21 600 €</td><td class="td-pct">100 %</td><td>Tantièmes thermiques</td></tr>
+<tr><td class="td-poste">Eau chaude collective</td><td>7 200 €</td><td class="td-pct">100 %</td><td>Tantièmes thermiques</td></tr>
+<tr><td class="td-poste">Eau froide parties communes</td><td>2 880 €</td><td class="td-pct">100 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Gardien (entretien + surveillance)</td><td>28 800 €</td><td class="td-pct">75 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Ascenseur</td><td>3 600 €</td><td class="td-pct">100 %</td><td>Clé ascenseur (lots 2+3+4+5+6)</td></tr>
+<tr><td class="td-poste">Nettoyage parties communes</td><td>1 440 €</td><td class="td-pct">100 %</td><td>Tantièmes généraux</td></tr>
+<tr><td class="td-poste">Espaces verts</td><td>2 400 €</td><td class="td-pct">100 %</td><td>Clé EV (lots 1+2+3)</td></tr>
+<tr><td class="td-poste">Toiture + ravalement</td><td>54 000 €</td><td class="td-pct nr">0 %</td><td>—</td></tr>
+</tbody></table></div>`,
+    questions: [
+      {
+        q: 'LOT 1 — Calculez le total des charges récupérables annuelles (tous postes + TEOM).',
+        reponse: 9010.55, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 1 — Régularisation (Provisions − Charges).',
+        reponse: -6610.55, tolerance: 8, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 4 — Calculez le total des charges récupérables annuelles du lot (tous postes + TEOM).',
+        reponse: 13393.06, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 4 — Montant des charges restant à la charge exclusive du bailleur (période de vacance).',
+        reponse: 2232.18, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 4 — Régularisation pour le locataire (10 mois de présence, Provisions − Charges).',
+        reponse: -9060.88, tolerance: 8, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 6 — Calculez le total des charges récupérables annuelles du lot (tous postes + TEOM).',
+        reponse: 6017.53, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 6 — Régularisation pour le locataire sortant (6 mois, Provisions − Charges).',
+        reponse: -2228.76, tolerance: 5, unite: '€',
+        aide: null
+      }
+    ]
+  },
+  {
+    id: 30, diff: 'expert',
+    titre: 'Immeuble Victor — Synthèse complète 5 lots, méthode jours réels',
+    note: 'Aucune aide. Méthode jours réels du mois (jour de sortie inclus, 2024 = 366 jours). Chaque locataire a une présence différente. Calculer la régularisation individuelle puis le flux bailleur total.',
+    contexte: [
+      { label: 'Charges récupérables immeuble', value: '45 600 € (tous postes confondus, déjà calculé)' },
+      { label: 'Année', value: '2024 (bissextile = 366 jours)' },
+      { label: 'Méthode', value: 'Jours réels du mois · Jour de sortie inclus · TEOM proratisée selon présence' },
+    ],
+    tableau: `<div class="section-titre">📋 Locataires — Immeuble Victor Hugo 2024</div>
+<div class="tableau-wrap"><table class="tableau-charges">
+<thead><tr>
+  <th>Lot</th><th>Tant.</th><th>Locataire</th><th>Entrée</th><th>Sortie</th><th>Jours</th><th>Prov. €/m</th><th>Mois payés</th><th>TEOM</th>
+</tr></thead>
+<tbody>
+<tr><td class="td-poste">Lot 1</td><td>180</td><td>Mme ALAMI</td><td>1er janvier</td><td>31 décembre</td><td>366 j</td><td>160</td><td>12</td><td>145 €</td></tr>
+<tr><td class="td-poste">Lot 2</td><td>200</td><td>M. BOUCHER</td><td>1er mars</td><td>31 décembre</td><td>306 j</td><td>180</td><td>10</td><td>165 €</td></tr>
+<tr><td class="td-poste">Lot 3</td><td>220</td><td>Mme CHEN</td><td>1er janvier</td><td>31 juillet</td><td>213 j</td><td>200</td><td>7</td><td>188 €</td></tr>
+<tr><td class="td-poste">Lot 4</td><td>200</td><td>M. DIOUF</td><td>1er août</td><td>31 décembre</td><td>153 j</td><td>180</td><td>5</td><td>165 €</td></tr>
+<tr><td class="td-poste">Lot 5</td><td>200</td><td>Mme ERNST</td><td>1er janvier</td><td>31 décembre</td><td>366 j</td><td>195</td><td>12</td><td>165 €</td></tr>
+</tbody></table></div>
+<div class="cas-note"><strong>Méthode :</strong> Charges + TEOM annuelles du lot = (45 600 × tantièmes/1000) + TEOM. Charges imputables = total annuel × jours présence / 366. Provisions = mensuelle × mois payés. Régularisation = Provisions − Charges imputables.</div>`,
+    questions: [
+      {
+        q: 'LOT 1 — Mme ALAMI : charges imputables (présence 12 mois).',
+        reponse: 8353, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 1 — Régularisation Mme ALAMI.',
+        reponse: -6433, tolerance: 3, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 2 — M. BOUCHER : charges imputables (306 jours / 366).',
+        reponse: 7762.87, tolerance: 3, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 2 — Régularisation M. BOUCHER.',
+        reponse: -5962.87, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 3 — Mme CHEN : charges imputables (213 jours / 366). Attention : janv(31)+fév(29)+mars(31)+avr(30)+mai(31)+juin(30)+juil(31) = 213 j.',
+        reponse: 5947.70, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 3 — Régularisation Mme CHEN.',
+        reponse: -4547.70, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 4 — M. DIOUF : charges imputables (153 jours / 366). Attention : août(31)+sep(30)+oct(31)+nov(30)+déc(31) = 153 j.',
+        reponse: 3881.43, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 4 — Régularisation M. DIOUF.',
+        reponse: -2981.43, tolerance: 5, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 5 — Mme ERNST : charges imputables (12 mois).',
+        reponse: 9285, tolerance: 2, unite: '€',
+        aide: null
+      },
+      {
+        q: 'LOT 5 — Régularisation Mme ERNST.',
+        reponse: -6945, tolerance: 3, unite: '€',
+        aide: null
+      },
+      {
+        q: 'SYNTHÈSE — Total des moins-perçus à appeler (valeur absolue, somme des 5 lots).',
+        reponse: 26870, tolerance: 20, unite: '€',
+        aide: null
+      }
+    ]
+  }
+
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -2010,9 +2346,9 @@ function switchTab(tab) {
 // ═══════════════════════════════════════════════════════════
 function initSelect() {
   const sel = document.getElementById('cas-select');
-  const diffLabel = { facile: '🟢', moyen: '🟡', difficile: '🔴', extreme: '⚫' };
-  const groupes = { facile: null, moyen: null, difficile: null, extreme: null };
-  const groupNames = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile', extreme: '⚫ Extrême' };
+  const diffLabel = { facile: '🟢', moyen: '🟡', difficile: '🔴', extreme: '⚫', expert: '🔥' };
+  const groupes = { facile: null, moyen: null, difficile: null, extreme: null, expert: null };
+  const groupNames = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile', extreme: '⚫ Extrême', expert: '🔥 Expert — Sans aide' };
 
   CAS.forEach(c => {
     if (!groupes[c.diff]) {
@@ -2025,7 +2361,7 @@ function initSelect() {
     groupes[c.diff].appendChild(opt);
   });
 
-  ['facile','moyen','difficile','extreme'].forEach(d => {
+  ['facile','moyen','difficile','extreme','expert'].forEach(d => {
     if (groupes[d]) sel.appendChild(groupes[d]);
   });
 }
@@ -2052,7 +2388,7 @@ function resetCas() {
 function renderCas() {
   const c = currentCas;
   const diffClass = c.diff;
-  const diffLabel = { facile: '✔ Facile', moyen: '◆ Moyen', difficile: '▲ Difficile', extreme: '⬛ Extrême' }[c.diff];
+  const diffLabel = { facile: '✔ Facile', moyen: '◆ Moyen', difficile: '▲ Difficile', extreme: '⬛ Extrême', expert: '🔥 Expert' }[c.diff];
 
   let ctxHtml = c.contexte.map(item => `
     <div class="ctx-item">
@@ -2085,14 +2421,14 @@ function renderCas() {
           <input type="number" step="any" class="answer-input" id="ans-${i}" placeholder="Votre réponse..." ${inputDisabled}>
           <span class="answer-unit">${q.unite}</span>
           <button class="btn-verifier" onclick="verifier(${i})" ${state !== 'pending' ? 'disabled' : ''}>Vérifier</button>
-          <button class="btn-aide" onclick="ouvrirAide(${i})" ${state === 'aide' ? 'disabled' : ''}>Résultat corrigé</button>
+          ${q.aide !== null ? `<button class="btn-aide" onclick="ouvrirAide(${i})" ${state === 'aide' ? 'disabled' : ''}>Résultat corrigé</button>` : ''}
         </div>
         <div class="feedback-msg" id="fb-${i}"></div>
-        <div class="aide-box ${aideOpen}" id="aide-${i}">
+        ${q.aide ? `<div class="aide-box ${aideOpen}" id="aide-${i}">
           <div class="aide-box-title">📌 Correction</div>
           <p>${q.aide.texte}</p>
           <div class="aide-formula">${q.aide.formule}</div>
-        </div>
+        </div>` : `<div class="aide-box" id="aide-${i}" style="display:none;"></div>`}
       </div>
     </div>`;
   }).join('');
@@ -2151,6 +2487,7 @@ function verifier(idx) {
 
 function ouvrirAide(idx) {
   if (questionStates[idx] === 'done') return;
+  if (!currentCas.questions[idx].aide) return;
   questionStates[idx] = 'aide';
   document.getElementById(`aide-${idx}`).classList.add('open');
   document.getElementById(`qblock-${idx}`).className = 'question-block state-aide';
